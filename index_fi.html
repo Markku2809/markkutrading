@@ -194,27 +194,6 @@
         </script>
       </div>
 
-      <!-- TradingView 80 Mile Plc -->
-      <div class="tradingview-widget-container" style="margin-top: 30px;">
-        <div id="tradingview_80mile"></div>
-        <script type="text/javascript">
-          new TradingView.widget({
-            "width": 800,
-            "height": 500,
-            "symbol": "LSE:80M",
-            "interval": "D",
-            "timezone": "Etc/UTC",
-            "theme": "light",
-            "style": "1",
-            "locale": "fi",
-            "toolbar_bg": "#f1f3f6",
-            "enable_publishing": false,
-            "hide_side_toolbar": false,
-            "allow_symbol_change": true,
-            "container_id": "tradingview_80mile"
-          });
-        </script>
-      </div>
     </div>
     <div class="section">
   <h2>Hölynpölyn laatikko</h2>
@@ -237,13 +216,7 @@
     localStorage.setItem("hoylynpolyn_sisalto", laatikko.value);
   });
 
-  // Tyhjennä-napin toiminto
-  function tyhjennaLaatikko() {
-    if (confirm("Haluatko varmasti tyhjentää kaiken hölynpölyn?")) {
-      laatikko.value = "";
-      localStorage.removeItem("hoylynpolyn_sisalto");
-    }
-  }
+
 </script>
   </main>
 
