@@ -27,21 +27,42 @@
       <a href="index_fi.html">🇫🇮 FI</a>
     </div>
   </header>
+
+  <!-- TradingView Mini Ticker LV -->
+  <div class="tradingview-widget-container" style="margin-top: -10px; margin-bottom: 20px;">
+    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js">
+    {
+      "symbols": [
+        { "proName": "OANDA:XAUUSD", "title": "Zelts" },
+        { "proName": "OANDA:SPX500USD", "title": "S&P 500" },
+        { "proName": "OANDA:NAS100USD", "title": "Nasdaq 100" },
+        { "proName": "OANDA:UK100GBP", "title": "FTSE 100" },
+        { "proName": "OANDA:DE30EUR", "title": "DAX" }
+      ],
+      "colorTheme": "light",
+      "isTransparent": false,
+      "displayMode": "adaptive",
+      "locale": "lv"
+    }
+    </script>
+  </div>
+  <!-- TradingView Mini Ticker END -->
+
   <main>
     <div class="section">
-      <h2>Laipni lūdzami</h2>
-      <p>Mēs esam mazs un čipers tirdzniecības birojs Ventspilī, kas koncentrējas uz akcijām un preču tirgu. Katru dienu veicam darījumus ar zeltu, kakao, akciju indeksiem un citiem globāliem instrumentiem.</p>
+      <h2>Laipni lūdzam</h2>
+      <p>Mēs esam neliels un veikls tirdzniecības birojs Ventspilī, kas koncentrējas uz akciju un preču tirgiem. Mēs ikdienā tirgojam zeltu, kakao, akciju indeksus un citus globālos instrumentus.</p>
     </div>
 
     <div class="section">
-      <h2>Mūsu darbība</h2>
-      <p>Mēs izmantojam tehnisko analīzi, piemēram, RSI, mainīgos vidējos, apjoma interpretāciju un ziņu sekošanu, apvienojot to ar pieredzi un intuīciju. Mērķis ir iemācīt un iedvesmot jaunos tirgotājus.</p>
+      <h2>Mūsu pieeja</h2>
+      <p>Mēs izmantojam tehnisko analīzi, piemēram, RSI, slīdošos vidējos rādītājus, apjomu interpretāciju un ziņu uzraudzību – apvienojumā ar pieredzi un intuīciju. Mūsu mērķis ir mācīt un iedvesmot jaunos tirgotājus.</p>
     </div>
 
     <div class="section">
-      <h2>Attēli un noskaņas</h2>
+      <h2>Fotoattēli un noskaņa</h2>
       <div class="images">
-        <img src="https://i.imgur.com/wGHcCQa.jpeg" alt="Markku tirgo ar Skilling">
+        <img src="https://i.imgur.com/wGHcCQa.jpeg" alt="Markku treido Skilling">
       </div>
     </div>
 
@@ -51,52 +72,54 @@
       Atrašanās vieta: Ventspils, Latvija</p>
     </div>
   </main>
+
   <footer>
-    &copy; 2025 AIM Trading – AI un Markku sadarbība tirgū
+    &copy; 2025 AIM Trading – Mākslīgā intelekta un Markku sadarbība tirgos
   </footer>
+
+  <!-- TradingView Gold -->
+  <div class="tradingview-widget-container">
+    <div id="tradingview_zelts_lv"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script type="text/javascript">
+      new TradingView.widget({
+        "width": 800,
+        "height": 500,
+        "symbol": "OANDA:XAUUSD",
+        "interval": "60",
+        "timezone": "Etc/UTC",
+        "theme": "light",
+        "style": "1",
+        "locale": "lv",
+        "toolbar_bg": "#f1f3f6",
+        "enable_publishing": false,
+        "hide_side_toolbar": false,
+        "allow_symbol_change": true,
+        "container_id": "tradingview_zelts_lv"
+      });
+    </script>
+  </div>
+
+  <!-- TradingView S&P 500 -->
+  <div class="tradingview-widget-container">
+    <div id="tradingview_sp500_lv"></div>
+    <script type="text/javascript">
+      new TradingView.widget({
+        "width": 800,
+        "height": 500,
+        "symbol": "OANDA:SPX500USD",
+        "interval": "60",
+        "timezone": "Etc/UTC",
+        "theme": "light",
+        "style": "1",
+        "locale": "lv",
+        "toolbar_bg": "#f1f3f6",
+        "enable_publishing": false,
+        "hide_side_toolbar": false,
+        "allow_symbol_change": true,
+        "container_id": "tradingview_sp500_lv"
+      });
+    </script>
+  </div>
 </body>
 </html>
-<!-- TradingView Zelta (Kulta) -->
-<div class="tradingview-widget-container">
-  <div id="tradingview_zelts_lv"></div>
-  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-  <script type="text/javascript">
-    new TradingView.widget({
-      "width": 800,
-      "height": 500,
-      "symbol": "OANDA:XAUUSD",
-      "interval": "60",
-      "timezone": "Etc/UTC",
-      "theme": "light",
-      "style": "1",
-      "locale": "lv",
-      "toolbar_bg": "#f1f3f6",
-      "enable_publishing": false,
-      "hide_side_toolbar": false,
-      "allow_symbol_change": true,
-      "container_id": "tradingview_zelts_lv"
-    });
-  </script>
-</div>
-
-<!-- TradingView S&P 500 -->
-<div class="tradingview-widget-container">
-  <div id="tradingview_sp500_lv"></div>
-  <script type="text/javascript">
-    new TradingView.widget({
-      "width": 800,
-      "height": 500,
-      "symbol": "OANDA:SPX500USD",
-      "interval": "60",
-      "timezone": "Etc/UTC",
-      "theme": "light",
-      "style": "1",
-      "locale": "lv",
-      "toolbar_bg": "#f1f3f6",
-      "enable_publishing": false,
-      "hide_side_toolbar": false,
-      "allow_symbol_change": true,
-      "container_id": "tradingview_sp500_lv"
-    });
-  </script>
-</div>
