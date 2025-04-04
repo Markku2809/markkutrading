@@ -131,3 +131,52 @@
 
 </body>
 </html>
+<div class="section">
+  <h2>Kaivosyhtiöt</h2>
+  <p>Tarkastelemme tässä kahden kaivosyhtiön, Rio Tinton ja Greenland Mineralsin, kehitystä. Näiden yhtiöiden toiminta liittyy vahvasti raaka-aineisiin, kuten kupariin, alumiiniin ja harvinaisiin maametalleihin.</p>
+
+  <!-- TradingView Rio Tinto -->
+  <div class="tradingview-widget-container">
+    <div id="tradingview_riotinto"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script type="text/javascript">
+      new TradingView.widget({
+        "width": 800,
+        "height": 500,
+        "symbol": "NYSE:RIO",
+        "interval": "D",
+        "timezone": "Etc/UTC",
+        "theme": "light",
+        "style": "1",
+        "locale": "fi",
+        "toolbar_bg": "#f1f3f6",
+        "enable_publishing": false,
+        "hide_side_toolbar": false,
+        "allow_symbol_change": true,
+        "container_id": "tradingview_riotinto"
+      });
+    </script>
+  </div>
+
+  <!-- TradingView Greenland Minerals -->
+  <div class="tradingview-widget-container" style="margin-top: 30px;">
+    <div id="tradingview_greenland"></div>
+    <script type="text/javascript">
+      new TradingView.widget({
+        "width": 800,
+        "height": 500,
+        "symbol": "ASX:GGG",
+        "interval": "D",
+        "timezone": "Etc/UTC",
+        "theme": "light",
+        "style": "1",
+        "locale": "fi",
+        "toolbar_bg": "#f1f3f6",
+        "enable_publishing": false,
+        "hide_side_toolbar": false,
+        "allow_symbol_change": true,
+        "container_id": "tradingview_greenland"
+      });
+    </script>
+  </div>
+</div>
