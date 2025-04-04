@@ -55,7 +55,7 @@
     &copy; 2025 AIM Trading – Tekoälyn ja Markun yhteistyötä markkinoilla
   </footer>
 
-  <!-- TradingView Widget BEGIN -->
+  <!-- TradingView Kulta -->
   <div class="tradingview-widget-container">
     <div id="tradingview_markkukulta"></div>
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
@@ -63,7 +63,7 @@
       new TradingView.widget({
         "width": 800,
         "height": 500,
-        "symbol": "OANDA:XAUUSD",  // Kulta
+        "symbol": "OANDA:XAUUSD",
         "interval": "60",
         "timezone": "Etc/UTC",
         "theme": "light",
@@ -77,7 +77,30 @@
       });
     </script>
   </div>
-  <!-- TradingView Widget END -->
+  <!-- TradingView Kulta END -->
+
+  <!-- TradingView S&P 500 -->
+  <div class="tradingview-widget-container">
+    <div id="tradingview_sp500"></div>
+    <script type="text/javascript">
+      new TradingView.widget({
+        "width": 800,
+        "height": 500,
+        "symbol": "OANDA:SPX500USD",
+        "interval": "60",
+        "timezone": "Etc/UTC",
+        "theme": "light",
+        "style": "1",
+        "locale": "fi",
+        "toolbar_bg": "#f1f3f6",
+        "enable_publishing": false,
+        "hide_side_toolbar": false,
+        "allow_symbol_change": true,
+        "container_id": "tradingview_sp500"
+      });
+    </script>
+  </div>
+  <!-- TradingView S&P 500 END -->
 
 </body>
 </html>
