@@ -26,7 +26,28 @@
       <a href="index_en.html">🇬🇧 EN</a>
       <a href="index_fi.html">🇫🇮 FI</a>
     </div>
-  </header>
+   </header>
+
+  <!-- TradingView Mini Ticker -->
+  <div class="tradingview-widget-container" style="margin-top: -10px; margin-bottom: 20px;">
+    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js">
+    {
+      "symbols": [
+        { "proName": "OANDA:XAUUSD", "title": "Kulta" },
+        { "proName": "OANDA:SPX500USD", "title": "S&P 500" },
+        { "proName": "OANDA:NAS100USD", "title": "Nasdaq 100" },
+        { "proName": "OANDA:UK100GBP", "title": "FTSE 100" },
+        { "proName": "OANDA:DE30EUR", "title": "DAX" }
+      ],
+      "colorTheme": "light",
+      "isTransparent": false,
+      "displayMode": "adaptive",
+      "locale": "fi"
+    }
+    </script>
+  </div>
+  <!-- TradingView Mini Ticker END -->
+
   <main>
     <div class="section">
       <h2>Tervetuloa</h2>
