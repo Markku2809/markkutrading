@@ -5,22 +5,63 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AIM Trading</title>
   <style>
-    body { font-family: Arial, sans-serif; background-color: #f5f5f5; margin: 0; padding: 0; }
- header {
-  background-color: #2d6a4f; /* murrettu vihreä */
-  color: white;
-  padding: 20px;
-  text-align: center;
-  position: relative;
-}
-    .lang-switch { position: absolute; top: 20px; right: 20px; }
-    .lang-switch a { color: #fff; margin-left: 10px; text-decoration: none; font-weight: bold; }
-    main { padding: 20px; max-width: 800px; margin: auto; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #2d6a4f; /* murrettu vihreä */
+      color: white;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
+
+    .lang-switch {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+
+    .lang-switch a {
+      color: #fff;
+      margin-left: 10px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    main {
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
     h1 { margin-top: 0; }
     .section { margin-bottom: 40px; }
-    .images { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-    .images img { width: 100%; max-width: 380px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-    footer { background-color: #eee; text-align: center; padding: 10px; font-size: 14px; color: #444; }
+    .images {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .images img {
+      width: 100%;
+      max-width: 380px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    footer {
+      background-color: #eee;
+      text-align: center;
+      padding: 10px;
+      font-size: 14px;
+      color: #444;
+    }
   </style>
 </head>
 <body>
@@ -32,7 +73,7 @@
       <a href="index_en.html">🇬🇧 EN</a>
       <a href="index_fi.html">🇫🇮 FI</a>
     </div>
-   </header>
+  </header>
 
   <!-- TradingView Mini Ticker -->
   <div class="tradingview-widget-container" style="margin-top: -10px; margin-bottom: 20px;">
@@ -52,7 +93,6 @@
     }
     </script>
   </div>
-  <!-- TradingView Mini Ticker END -->
 
   <main>
     <div class="section">
@@ -77,105 +117,109 @@
       <p>Sähköposti: <strong>markkuinvest@gmail.com</strong><br>
       Sijainti: Ventspils, Latvia</p>
     </div>
+
+    <div class="section">
+      <h2>Markkinat</h2>
+
+      <!-- TradingView Kulta -->
+      <div class="tradingview-widget-container">
+        <div id="tradingview_markkukulta"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+        <script type="text/javascript">
+          new TradingView.widget({
+            "width": 800,
+            "height": 500,
+            "symbol": "OANDA:XAUUSD",
+            "interval": "60",
+            "timezone": "Etc/UTC",
+            "theme": "light",
+            "style": "1",
+            "locale": "fi",
+            "toolbar_bg": "#f1f3f6",
+            "enable_publishing": false,
+            "hide_side_toolbar": false,
+            "allow_symbol_change": true,
+            "container_id": "tradingview_markkukulta"
+          });
+        </script>
+      </div>
+
+      <!-- TradingView S&P 500 -->
+      <div class="tradingview-widget-container" style="margin-top: 30px;">
+        <div id="tradingview_sp500"></div>
+        <script type="text/javascript">
+          new TradingView.widget({
+            "width": 800,
+            "height": 500,
+            "symbol": "OANDA:SPX500USD",
+            "interval": "60",
+            "timezone": "Etc/UTC",
+            "theme": "light",
+            "style": "1",
+            "locale": "fi",
+            "toolbar_bg": "#f1f3f6",
+            "enable_publishing": false,
+            "hide_side_toolbar": false,
+            "allow_symbol_change": true,
+            "container_id": "tradingview_sp500"
+          });
+        </script>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Kaivosyhtiöt</h2>
+      <p>Tarkastelemme kahden kaivosyhtiön, Rio Tinton ja 80 Mile Plc:n (ent. Bluejay Mining), kehitystä. Näiden yhtiöiden toiminta liittyy vahvasti raaka-aineisiin, kuten kupariin, alumiiniin ja harvinaisiin maametalleihin.</p>
+
+      <!-- TradingView Rio Tinto -->
+      <div class="tradingview-widget-container">
+        <div id="tradingview_riotinto"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+        <script type="text/javascript">
+          new TradingView.widget({
+            "width": 800,
+            "height": 500,
+            "symbol": "NYSE:RIO",
+            "interval": "D",
+            "timezone": "Etc/UTC",
+            "theme": "light",
+            "style": "1",
+            "locale": "fi",
+            "toolbar_bg": "#f1f3f6",
+            "enable_publishing": false,
+            "hide_side_toolbar": false,
+            "allow_symbol_change": true,
+            "container_id": "tradingview_riotinto"
+          });
+        </script>
+      </div>
+
+      <!-- TradingView 80 Mile Plc -->
+      <div class="tradingview-widget-container" style="margin-top: 30px;">
+        <div id="tradingview_80mile"></div>
+        <script type="text/javascript">
+          new TradingView.widget({
+            "width": 800,
+            "height": 500,
+            "symbol": "LSE:80M",
+            "interval": "D",
+            "timezone": "Etc/UTC",
+            "theme": "light",
+            "style": "1",
+            "locale": "fi",
+            "toolbar_bg": "#f1f3f6",
+            "enable_publishing": false,
+            "hide_side_toolbar": false,
+            "allow_symbol_change": true,
+            "container_id": "tradingview_80mile"
+          });
+        </script>
+      </div>
+    </div>
   </main>
+
   <footer>
     &copy; 2025 AIM Trading – Tekoälyn ja Markun yhteistyötä markkinoilla
   </footer>
-
-  <!-- TradingView Kulta -->
-  <div class="tradingview-widget-container">
-    <div id="tradingview_markkukulta"></div>
-    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-    <script type="text/javascript">
-      new TradingView.widget({
-        "width": 800,
-        "height": 500,
-        "symbol": "OANDA:XAUUSD",
-        "interval": "60",
-        "timezone": "Etc/UTC",
-        "theme": "light",
-        "style": "1",
-        "locale": "fi",
-        "toolbar_bg": "#f1f3f6",
-        "enable_publishing": false,
-        "hide_side_toolbar": false,
-        "allow_symbol_change": true,
-        "container_id": "tradingview_markkukulta"
-      });
-    </script>
-  </div>
-  <!-- TradingView Kulta END -->
-
-  <!-- TradingView S&P 500 -->
-  <div class="tradingview-widget-container">
-    <div id="tradingview_sp500"></div>
-    <script type="text/javascript">
-      new TradingView.widget({
-        "width": 800,
-        "height": 500,
-        "symbol": "OANDA:SPX500USD",
-        "interval": "60",
-        "timezone": "Etc/UTC",
-        "theme": "light",
-        "style": "1",
-        "locale": "fi",
-        "toolbar_bg": "#f1f3f6",
-        "enable_publishing": false,
-        "hide_side_toolbar": false,
-        "allow_symbol_change": true,
-        "container_id": "tradingview_sp500"
-      });
-    </script>
-  </div>
-  <!-- TradingView S&P 500 END -->
-
 </body>
 </html>
-<div class="section">
-  <h2>Kaivosyhtiöt</h2>
-  <p>Tarkastelemme tässä kahden kaivosyhtiön, Rio Tinton ja Greenland Mineralsin, kehitystä. Näiden yhtiöiden toiminta liittyy vahvasti raaka-aineisiin, kuten kupariin, alumiiniin ja harvinaisiin maametalleihin.</p>
-
-  <!-- TradingView Rio Tinto -->
-  <div class="tradingview-widget-container">
-    <div id="tradingview_riotinto"></div>
-    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-    <script type="text/javascript">
-      new TradingView.widget({
-        "width": 800,
-        "height": 500,
-        "symbol": "NYSE:RIO",
-        "interval": "D",
-        "timezone": "Etc/UTC",
-        "theme": "light",
-        "style": "1",
-        "locale": "fi",
-        "toolbar_bg": "#f1f3f6",
-        "enable_publishing": false,
-        "hide_side_toolbar": false,
-        "allow_symbol_change": true,
-        "container_id": "tradingview_riotinto"
-      });
-    </script>
-  </div>
-<!-- TradingView 80 Mile Plc -->
-<div class="tradingview-widget-container">
-  <div id="tradingview_80mile"></div>
-  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-  <script type="text/javascript">
-    new TradingView.widget({
-      "width": 800,
-      "height": 500,
-      "symbol": "LSE:80M",
-      "interval": "D",
-      "timezone": "Etc/UTC",
-      "theme": "light",
-      "style": "1",
-      "locale": "fi",
-      "toolbar_bg": "#f1f3f6",
-      "enable_publishing": false,
-      "hide_side_toolbar": false,
-      "allow_symbol_change": true,
-      "container_id": "tradingview_80mile"
-    });
-  </script>
-</div>
