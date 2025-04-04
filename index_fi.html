@@ -216,6 +216,35 @@
         </script>
       </div>
     </div>
+    <div class="section">
+  <h2>Hölynpölyn laatikko</h2>
+  <p>Kirjoita vapaasti päivän treideistä, tunteista, rukouksista tai vaikka hölynpölystä. Tämä kenttä tallentaa automaattisesti tekstin selaimeesi.</p>
+  
+  <textarea id="hoylynpolyn-laatikko" rows="12" cols="80" placeholder="Tähän saa purkaa mieltäsi..."></textarea>
+  
+  <br><br>
+  <button onclick="tyhjennaLaatikko()">Tyhjennä laatikko</button>
+</div>
+
+<script>
+  const laatikko = document.getElementById("hoylynpolyn-laatikko");
+
+  // Lataa tallennettu sisältö
+  laatikko.value = localStorage.getItem("hoylynpolyn_sisalto") || "";
+
+  // Tallennus automaattisesti kirjoittaessa
+  laatikko.addEventListener("input", () => {
+    localStorage.setItem("hoylynpolyn_sisalto", laatikko.value);
+  });
+
+  // Tyhjennä-napin toiminto
+  function tyhjennaLaatikko() {
+    if (confirm("Haluatko varmasti tyhjentää kaiken hölynpölyn?")) {
+      laatikko.value = "";
+      localStorage.removeItem("hoylynpolyn_sisalto");
+    }
+  }
+</script>
   </main>
 
   <footer>
