@@ -142,7 +142,45 @@
   color: black;
 }
 </style>
+<!-- 💎 Hyödykebanneri (pyörivä + linkit + pysähtyy) -->
+<div class="ticker-container">
+  <h3 style="text-align: center;">💎 Hyödykemarkkinat</h3>
+  <div class="ticker-content">
+    <span><a href="https://www.tradingview.com/symbols/OANDA-XAUUSD/" target="_blank"><strong>Kulta</strong></a> $2342.50 <span style="color: green;">▲ 0.45%</span></span>
+    <span><a href="https://www.tradingview.com/symbols/OANDA-XCUUSD/" target="_blank"><strong>Kupari</strong></a> $4.25 <span style="color: red;">▼ 0.20%</span></span>
+    <span><a href="https://www.tradingview.com/symbols/OANDA-XPDUSD/" target="_blank"><strong>Palladium</strong></a> $1050.30 <span style="color: green;">▲ 1.05%</span></span>
+    <span><a href="https://www.tradingview.com/symbols/OANDA-XPTUSD/" target="_blank"><strong>Platina</strong></a> $968.80 <span style="color: red;">▼ 0.32%</span></span>
+    <span><a href="https://www.tradingview.com/symbols/OANDA-UKOIL/" target="_blank"><strong>Öljy (Brent)</strong></a> $89.20 <span style="color: green;">▲ 0.91%</span></span>
+  </div>
+</div>
 
+<style>
+.ticker-container {
+  background-color: #e6f2ff;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  overflow: hidden;
+  font-family: sans-serif;
+  white-space: nowrap;
+}
+.ticker-content {
+  display: inline-block;
+  animation: scroll-left 28s linear infinite;
+}
+.ticker-container:hover .ticker-content {
+  animation-play-state: paused;
+}
+.ticker-content span {
+  display: inline-block;
+  margin-right: 40px;
+}
+.ticker-content a {
+  text-decoration: none;
+  color: black;
+}
+</style>
 <main>
     <div class="section">
       <h2>Tervetuloa</h2>
