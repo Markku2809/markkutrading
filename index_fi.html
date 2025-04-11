@@ -103,17 +103,45 @@
     </script>
   </div>
 
-<!-- 📊 Markun tarkkailulista (liikkuva) -->
-<div style="background-color: #f2f2f2; padding: 10px; overflow: hidden; white-space: nowrap; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); font-family: sans-serif;">
+<!-- 📊 Markun tarkkailulista (liikkuva + linkit + pysähtyy) -->
+<div class="ticker-container">
   <h3 style="text-align: center;">📊 Markun tarkkailulista (liikkuva)</h3>
-  <div style="display: inline-block; animation: scroll-left 25s linear infinite;">
-    <span style="margin-right: 40px;"><strong>NVDA</strong> $845.00 <span style="color: green;">▲ 1.23%</span></span>
-    <span style="margin-right: 40px;"><strong>TSLA</strong> $172.30 <span style="color: red;">▼ 0.85%</span></span>
-    <span style="margin-right: 40px;"><strong>M3</strong> ¥2,145.50 <span style="color: green;">▲ 0.42%</span></span>
-    <span style="margin-right: 40px;"><strong>AMD</strong> $165.70 <span style="color: green;">▲ 1.11%</span></span>
-    <span style="margin-right: 40px;"><strong>NESTE.HE</strong> €26.42 <span style="color: red;">▼ 0.20%</span></span>
+  <div class="ticker-content">
+    <span><a href="https://www.tradingview.com/symbols/NASDAQ-NVDA/" target="_blank"><strong>NVDA</strong></a> $845.00 <span style="color: green;">▲ 1.23%</span></span>
+    <span><a href="https://www.tradingview.com/symbols/NASDAQ-TSLA/" target="_blank"><strong>TSLA</strong></a> $172.30 <span style="color: red;">▼ 0.85%</span></span>
+    <span><a href="https://www.tradingview.com/symbols/TSE-M3/" target="_blank"><strong>M3</strong></a> ¥2,145.50 <span style="color: green;">▲ 0.42%</span></span>
+    <span><a href="https://www.tradingview.com/symbols/NASDAQ-AMD/" target="_blank"><strong>AMD</strong></a> $165.70 <span style="color: green;">▲ 1.11%</span></span>
+    <span><a href="https://www.tradingview.com/symbols/OMXHEX-NESTE/" target="_blank"><strong>NESTE.HE</strong></a> €26.42 <span style="color: red;">▼ 0.20%</span></span>
   </div>
 </div>
+
+<style>
+.ticker-container {
+  background-color: #f2f2f2;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  overflow: hidden;
+  font-family: sans-serif;
+  white-space: nowrap;
+}
+.ticker-content {
+  display: inline-block;
+  animation: scroll-left 25s linear infinite;
+}
+.ticker-container:hover .ticker-content {
+  animation-play-state: paused;
+}
+.ticker-content span {
+  display: inline-block;
+  margin-right: 40px;
+}
+.ticker-content a {
+  text-decoration: none;
+  color: black;
+}
+</style>
 
 <main>
     <div class="section">
