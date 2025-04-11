@@ -13,7 +13,7 @@
     }
 
     header {
-      background-color: #2d6a4f; /* murrettu vihreä */
+      background-color: #2d6a4f;
       color: white;
       padding: 20px;
       text-align: center;
@@ -92,6 +92,33 @@
       "locale": "fi"
     }
     </script>
+  </div>
+
+  <!-- 📊 Markun tarkkailulista -->
+  <div style="background-color: #f2f2f2; padding: 10px; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); font-family: sans-serif;">
+    <h3 style="margin-top: 0; text-align: center;">📊 Markun tarkkailulista</h3>
+    <div style="display: flex; justify-content: space-around; flex-wrap: wrap; text-align: center;">
+      <div>
+        <strong>NVDA</strong><br>
+        $845.00 <span style="color: green;">▲ 1.23%</span>
+      </div>
+      <div>
+        <strong>TSLA</strong><br>
+        $172.30 <span style="color: red;">▼ 0.85%</span>
+      </div>
+      <div>
+        <strong>M3</strong><br>
+        ¥2,145.50 <span style="color: green;">▲ 0.42%</span>
+      </div>
+      <div>
+        <strong>AMD</strong><br>
+        $165.70 <span style="color: green;">▲ 1.11%</span>
+      </div>
+      <div>
+        <strong>NESTE.HE</strong><br>
+        €26.42 <span style="color: red;">▼ 0.20%</span>
+      </div>
+    </div>
   </div>
 
   <main>
@@ -195,37 +222,30 @@
       </div>
 
     </div>
+
     <div class="section">
-  <h2>Hölynpölyn laatikko</h2>
-  <p>Kirjoita vapaasti päivän treideistä, tunteista, rukouksista tai vaikka hölynpölystä. Tämä kenttä tallentaa automaattisesti tekstin selaimeesi.</p>
-  
-  <textarea id="hoylynpolyn-laatikko" rows="48" cols="100" placeholder="Tähän saa purkaa mieltäsi..."></textarea>
-  
-  <br><br>
+      <h2>Hölynpölyn laatikko</h2>
+      <p>Kirjoita vapaasti päivän treideistä, tunteista, rukouksista tai vaikka hölynpölystä. Tämä kenttä tallentaa automaattisesti tekstin selaimeesi.</p>
+      <textarea id="hoylynpolyn-laatikko" rows="48" cols="100" placeholder="Tähän saa purkaa mieltäsi..."></textarea>
+      <br><br>
+    </div>
 
-</div>
+    <script>
+      const laatikko = document.getElementById("hoylynpolyn-laatikko");
+      laatikko.value = localStorage.getItem("hoylynpolyn_sisalto") || "";
+      laatikko.addEventListener("input", () => {
+        localStorage.setItem("hoylynpolyn_sisalto", laatikko.value);
+      });
+    </script>
 
-<script>
-  const laatikko = document.getElementById("hoylynpolyn-laatikko");
-
-  // Lataa tallennettu sisältö
-  laatikko.value = localStorage.getItem("hoylynpolyn_sisalto") || "";
-
-  // Tallennus automaattisesti kirjoittaessa
-  laatikko.addEventListener("input", () => {
-    localStorage.setItem("hoylynpolyn_sisalto", laatikko.value);
-  });
-
-
-</script>
-<div class="section">
-  <h2>Treidauspäiväkirja</h2>
-  <p>📘 <a href="paivakirja.html">Siirry treidauspäiväkirjaan</a> – seuraa päivittäisiä optioita ja oivalluksia!</p>
-</div>    
+    <div class="section">
+      <h2>Treidauspäiväkirja</h2>
+      <p>📘 <a href="paivakirja.html">Siirry treidauspäiväkirjaan</a> – seuraa päivittäisiä optioita ja oivalluksia!</p>
+    </div>    
   </main>
 
   <footer>
     &copy; 2025 AIM Trading – Tekoälyn ja Markun yhteistyötä markkinoilla
   </footer>
 </body>
-
+</html>
