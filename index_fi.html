@@ -103,7 +103,7 @@
     </script>
   </div>
 
-  <!-- Pyörivä osakebanneri -->
+  <!-- 📊 Markun tarkkailulista (liikkuva) -->
   <div style="background-color: #f2f2f2; padding: 10px; overflow: hidden; white-space: nowrap; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); font-family: sans-serif;">
     <h3 style="text-align: center;">📊 Markun tarkkailulista (liikkuva)</h3>
     <div style="display: inline-block; animation: scroll-left 25s linear infinite;">
@@ -116,8 +116,124 @@
   </div>
 
   <main>
-    <!-- Sisältö jatkuu kuten ennen -->
-    <!-- ... -->
+    <div class="section">
+      <h2>Tervetuloa</h2>
+      <p>Olemme pieni ja ketterä kaupankäyntitoimisto Ventspilsissä, joka keskittyy osake- ja hyödykemarkkinoihin. Käymme päivittäin kauppaa kullalla, kaakaolla, osakeindekseillä ja muilla globaaleilla instrumenteilla.</p>
+    </div>
+
+    <div class="section">
+      <h2>Toimintatapamme</h2>
+      <p>Käytämme teknistä analyysiä, kuten RSI:tä, liukuvia keskiarvoja, volyymin tulkintaa ja uutisseurantaa, yhdistettynä kokemukseen ja intuitioon. Tavoitteena on opettaa ja innostaa uusia treidaajia.</p>
+    </div>
+
+    <div class="section">
+      <h2>Kuvia ja tunnelmaa</h2>
+      <div class="images">
+        <img src="https://i.imgur.com/wGHcCQa.jpeg" alt="Markku treidaa Skillingillä">
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Yhteystiedot</h2>
+      <p>Sähköposti: <strong>markkuinvest@gmail.com</strong><br>
+      Sijainti: Ventspils, Latvia</p>
+    </div>
+
+    <div class="section">
+      <h2>Markkinat</h2>
+
+      <!-- TradingView Kulta -->
+      <div class="tradingview-widget-container">
+        <div id="tradingview_markkukulta"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+        <script type="text/javascript">
+          new TradingView.widget({
+            "width": 800,
+            "height": 500,
+            "symbol": "OANDA:XAUUSD",
+            "interval": "60",
+            "timezone": "Etc/UTC",
+            "theme": "light",
+            "style": "1",
+            "locale": "fi",
+            "toolbar_bg": "#f1f3f6",
+            "enable_publishing": false,
+            "hide_side_toolbar": false,
+            "allow_symbol_change": true,
+            "container_id": "tradingview_markkukulta"
+          });
+        </script>
+      </div>
+
+      <!-- TradingView S&P 500 -->
+      <div class="tradingview-widget-container" style="margin-top: 30px;">
+        <div id="tradingview_sp500"></div>
+        <script type="text/javascript">
+          new TradingView.widget({
+            "width": 800,
+            "height": 500,
+            "symbol": "OANDA:SPX500USD",
+            "interval": "60",
+            "timezone": "Etc/UTC",
+            "theme": "light",
+            "style": "1",
+            "locale": "fi",
+            "toolbar_bg": "#f1f3f6",
+            "enable_publishing": false,
+            "hide_side_toolbar": false,
+            "allow_symbol_change": true,
+            "container_id": "tradingview_sp500"
+          });
+        </script>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Kaivosyhtiöt</h2>
+      <p>Tarkastelemme kahden kaivosyhtiön, Rio Tinton ja 80 Mile Plc:n (ent. Bluejay Mining), kehitystä. Näiden yhtiöiden toiminta liittyy vahvasti raaka-aineisiin, kuten kupariin, alumiiniin ja harvinaisiin maametalleihin.</p>
+
+      <!-- TradingView Rio Tinto -->
+      <div class="tradingview-widget-container">
+        <div id="tradingview_riotinto"></div>
+        <script type="text/javascript">
+          new TradingView.widget({
+            "width": 800,
+            "height": 500,
+            "symbol": "NYSE:RIO",
+            "interval": "D",
+            "timezone": "Etc/UTC",
+            "theme": "light",
+            "style": "1",
+            "locale": "fi",
+            "toolbar_bg": "#f1f3f6",
+            "enable_publishing": false,
+            "hide_side_toolbar": false,
+            "allow_symbol_change": true,
+            "container_id": "tradingview_riotinto"
+          });
+        </script>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Hölynpölyn laatikko</h2>
+      <p>Kirjoita vapaasti päivän treideistä, tunteista, rukouksista tai vaikka hölynpölystä. Tämä kenttä tallentaa automaattisesti tekstin selaimeesi.</p>
+      <textarea id="hoylynpolyn-laatikko" rows="48" cols="100" placeholder="Tähän saa purkaa mieltäsi..."></textarea>
+      <br><br>
+    </div>
+
+    <script>
+      const laatikko = document.getElementById("hoylynpolyn-laatikko");
+      laatikko.value = localStorage.getItem("hoylynpolyn_sisalto") || "";
+      laatikko.addEventListener("input", () => {
+        localStorage.setItem("hoylynpolyn_sisalto", laatikko.value);
+      });
+    </script>
+
+    <div class="section">
+      <h2>Treidauspäiväkirja</h2>
+      <p>📘 <a href="paivakirja.html">Siirry treidauspäiväkirjaan</a> – seuraa päivittäisiä optioita ja oivalluksia!</p>
+    </div>    
   </main>
 
   <footer>
