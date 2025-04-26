@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <title>DeltaMittari</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; background: #f4f4f4; }
+    h1 { color: #333; }
+    label { display: block; margin-top: 20px; }
+    input { padding: 8px; width: 300px; margin-top: 5px; }
+    button { padding: 10px 20px; margin-top: 20px; cursor: pointer; }
+    #result { margin-top: 30px; font-size: 1.2em; }
+    .footer { margin-top: 50px; font-size: 0.9em; color: #666; }
+  </style>
+</head>
+<body>
+
+<h1>DeltaMittari</h1>
+<p>Syötä tiedot ja laske optiolle arvioitu Delta!</p>
+
+<label for="stockPrice">Kohde-etuuden hinta:</label>
+<input type="number" id="stockPrice" placeholder="Esim. 22461">
+
+<label for="strikePrice">Strike-hinta:</label>
+<input type="number" id="strikePrice" placeholder="Esim. 22600">
+
+<label for="iv">Volatiliteetti (%):</label>
+<input type="number" id="iv" placeholder="Esim. 18.15">
+
+<br>
+<button onclick="calculateDelta()">Laske Delta</button>
+
+<div id="result"></div>
+
+<div class="footer">
+<p>Tekijä: Markku ja Joosef - numerot kertovat</p>
+</div>
+
+<script>
+function calculateDelta() {
+  const stockPrice = parseFloat(document.getElementById('stockPrice').value);
+  const strikePrice = parseFloat(document.getElementById('strikePrice').value);
+  const iv = parseFloat(document.getElementById('iv').value) / 100;
+
+  if (isNaN(stockPrice) || isNaN(strikePrice) || isNaN(iv)) {
+    document.getElementById('result').innerHTML = "<b>Anna kaikki tiedot oikein!</b>";
+    return;
+  }
+
+  // Yksinkertaistettu laskenta, deltaa arvioidaan etäisyydellä ja volatiliteetilla
+  let moneyness = (stockPrice - strikePrice) / (stockPrice * iv);
+  let delta = 1 / (1 + Math.exp(-1.7 * moneyness));
+
+  delta = Math.min(Math.max(delta, 0), 1); // Rajataan välille 0-1
+
+  document.getElementById('result').innerHTML =
+    `<b>Arvioitu Delta:</b> ${delta.toFixed(3)}<br>` +
+    `Tämä tarkoittaa noin ${(delta * 100).toFixed(1)} % todennäköisyyttä, että optio päätyy voitolle.`;
+}
+</script>
+
+</body>
+</html>
