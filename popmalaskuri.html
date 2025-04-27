@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="fi">
 <head>
     <meta charset="UTF-8">
@@ -43,6 +44,7 @@
 </head>
 <body>
     <h1>POP-MA Laskuri</h1>
+
     <label for="kohdehinta">Kohde-etuuden hinta:</label>
     <input type="number" id="kohdehinta" placeholder="Esim. 3158">
 
@@ -87,6 +89,14 @@
             document.getElementById('tulos').innerHTML = `POP: ${korjattuPop.toFixed(2)} %<br>${trendi}`;
         }
     </script>
+
+    <div style="text-align: center; margin-top: 40px;">
+      <a href="index.html">
+        <button style="background-color: #4CAF50; color: white; padding: 12px 24px; font-size: 18px; border: none; border-radius: 8px; cursor: pointer;">
+          Palaa pääsivulle
+        </button>
+      </a>
+    </div>
 </body>
 </html>
 
