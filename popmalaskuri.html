@@ -1,56 +1,92 @@
-<!DOCTYPE html>
 <html lang="fi">
 <head>
-  <meta charset="UTF-8">
-  <title>POP-MA Laskuri</title>
-  <style>
-    body { font-family: Arial, sans-serif; background-color: #f0f8ff; padding: 20px; }
-    h1 { color: #003366; }
-    label { display: block; margin-top: 15px; }
-    input { padding: 5px; width: 200px; }
-    button { margin-top: 20px; padding: 10px 20px; background-color: #007bff; color: white; border: none; cursor: pointer; }
-    .tulos { margin-top: 30px; font-size: 18px; }
-    .long { color: green; }
-    .short { color: red; }
-  </style>
+    <meta charset="UTF-8">
+    <title>POP-MA Laskuri</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            color: #003366;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+        }
+        input {
+            padding: 5px;
+            width: 200px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .tulos {
+            margin-top: 30px;
+            font-size: 18px;
+        }
+        .long {
+            color: green;
+        }
+        .short {
+            color: red;
+        }
+    </style>
 </head>
 <body>
-  <h1>POP-MA Laskuri</h1>
-  
-  <label>Kohde-etuuden hinta:</label>
-  <input type="number" id="kohdeHinta" placeholder="Esim. 3158">
+    <h1>POP-MA Laskuri</h1>
+    <label for="kohdehinta">Kohde-etuuden hinta:</label>
+    <input type="number" id="kohdehinta" placeholder="Esim. 3158">
 
-  <label>Optiohinta (preemio):</label>
-  <input type="number" id="optioHinta" placeholder="Esim. 258">
+    <label for="optiohinta">Optiohinta (preemio):</label>
+    <input type="number" id="optiohinta" placeholder="Esim. 258">
 
-  <label>MA-taso (esim. MA25):</label>
-  <input type="number" id="maTaso" placeholder="Esim. 3200">
+    <label for="ma">MA-taso (esim. MA25):</label>
+    <input type="number" id="ma" placeholder="Esim. 3200">
 
-  <button onclick="laskePOPMA()">Laske</button>
+    <label for="aika">Aika erääntymiseen (päivinä):</label>
+    <input type="number" id="aika" placeholder="Esim. 30">
 
-  <div class="tulos" id="popTulos"></div>
-  <div class="tulos" id="trendTulos"></div>
+    <button onclick="laskePOP()">Laske</button>
 
-  <script>
-    function laskePOPMA() {
-      var kohde = parseFloat(document.getElementById('kohdeHinta').value);
-      var optio = parseFloat(document.getElementById('optioHinta').value);
-      var ma = parseFloat(document.getElementById('maTaso').value);
+    <div class="tulos" id="tulos"></div>
 
-      if (isNaN(kohde) || isNaN(optio) || isNaN(ma) || optio === 0) {
-        alert('Täytä kaikki kentät oikein!');
-        return;
-      }
+    <script>
+        function laskePOP() {
+            var kohdehinta = parseFloat(document.getElementById('kohdehinta').value);
+            var optiohinta = parseFloat(document.getElementById('optiohinta').value);
+            var ma = parseFloat(document.getElementById('ma').value);
+            var aika = parseFloat(document.getElementById('aika').value);
 
-      var pop = kohde / optio;
-      document.getElementById('popTulos').innerHTML = "<strong>POP-luku:</strong> " + pop.toFixed(2);
+            if (isNaN(kohdehinta) || isNaN(optiohinta)) {
+                document.getElementById('tulos').innerHTML = "Syötä kohde-etuuden hinta ja optiohinta.";
+                return;
+            }
 
-      if (kohde > ma) {
-        document.getElementById('trendTulos').innerHTML = "<strong>Trendisuunta:</strong> <span class='long'>Nouseva (Long) ✅</span>";
-      } else {
-        document.getElementById('trendTulos').innerHTML = "<strong>Trendisuunta:</strong> <span class='short'>Laskeva (Short) ⚡</span>";
-      }
-    }
-  </script>
+            var pop = (optiohinta / kohdehinta) * 100;
+            var korjattuPop = pop;
+
+            if (!isNaN(aika) && aika > 0) {
+                korjattuPop = pop * Math.sqrt(30 / aika);
+            }
+
+            var trendi = "";
+
+            if (!isNaN(ma)) {
+                trendi = kohdehinta > ma ? "<span class='long'>MA Trend: Long</span>" : "<span class='short'>MA Trend: Short</span>";
+            }
+
+            document.getElementById('tulos').innerHTML = `POP: ${korjattuPop.toFixed(2)} %<br>${trendi}`;
+        }
+    </script>
 </body>
 </html>
+
