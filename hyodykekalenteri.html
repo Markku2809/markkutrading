@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIM Trading – Hyödykekalenteri</title>
+  <meta name="description" content="AIM Tradingin hyödykekalenteri: kahvi, kaakao, soija ja maakaasu yhdessä selkeässä vuosinäkymässä." />
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #121933;
+      --panel-2: #18213f;
+      --text: #eef2ff;
+      --muted: #aab4d6;
+      --border: rgba(255,255,255,0.10);
+      --neutral: #27304d;
+      --watch: #163a63;
+      --entry: #184b30;
+      --risk: #5a4615;
+      --danger: #5b1f28;
+      --accent: #8fb3ff;
+      --accent-2: #d7e3ff;
+      --shadow: 0 20px 50px rgba(0,0,0,0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(143,179,255,0.12), transparent 28%),
+        linear-gradient(180deg, #09101f 0%, #0b1020 100%);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .hero,
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(6px);
+    }
+
+    .hero {
+      padding: 32px;
+      margin-bottom: 20px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid rgba(143,179,255,0.24);
+      border-radius: 999px;
+      color: var(--accent-2);
+      background: rgba(143,179,255,0.08);
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+
+    h1, h2, h3 { margin: 0 0 12px; }
+
+    h1 {
+      font-size: clamp(30px, 5vw, 48px);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    h2 {
+      font-size: 24px;
+      letter-spacing: -0.02em;
+    }
+
+    p {
+      margin: 0 0 12px;
+      color: var(--muted);
+      max-width: 900px;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: var(--accent-2);
+      margin-top: 8px;
+      font-size: 14px;
+    }
+
+    .card {
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1180px;
+      background: rgba(8,12,24,0.6);
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 10px 8px;
+      text-align: center;
+      vertical-align: middle;
+      font-size: 14px;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: #111831;
+      color: var(--accent-2);
+    }
+
+    th:first-child,
+    td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      text-align: left;
+      min-width: 140px;
+      font-weight: 700;
+      background: #0e152b;
+    }
+
+    thead th:first-child { z-index: 3; }
+
+    th:last-child,
+    td:last-child {
+      min-width: 300px;
+      text-align: left;
+    }
+
+    .neutral { background: var(--neutral); }
+    .watch { background: var(--watch); }
+    .entry { background: var(--entry); animation: pulse 2.3s infinite; }
+    .risk { background: var(--risk); }
+    .danger { background: var(--danger); animation: pulse 1.8s infinite; }
+
+    .now {
+      outline: 3px solid var(--accent);
+      outline-offset: -3px;
+      font-weight: 700;
+    }
+
+    .legend,
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .legend-item,
+    .mini-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .swatch {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.1);
+      flex: 0 0 auto;
+    }
+
+    ul {
+      margin: 8px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+    }
+
+    code {
+      background: rgba(255,255,255,0.08);
+      padding: 2px 6px;
+      border-radius: 6px;
+      color: var(--accent-2);
+    }
+
+    .footer-note {
+      font-size: 13px;
+      color: #92a0cb;
+      margin-top: 10px;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: inset 0 0 0 0 rgba(255,255,255,0.04); }
+      50% { box-shadow: inset 0 0 0 999px rgba(255,255,255,0.07); }
+    }
+
+    @media (max-width: 768px) {
+      .container { padding: 16px; }
+      .hero, .card { padding: 18px; border-radius: 18px; }
+      h2 { font-size: 20px; }
+      th, td { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="hero">
+      <div class="eyebrow">📈 AIM Trading</div>
+      <h1>Hyödykekalenteri</h1>
+      <p>
+        Selkeä vuosinäkymä kahville, kaakaolle, soijalle ja maakaasulle. Tarkoitus ei ole esittää kristallipalloa,
+        vaan antaa rauhallinen kartta: milloin seurata, milloin harkita ostoikkunaa ja milloin kannattaa pitää sormet
+        poissa napilta kuin kahvikuppi näppäimistön vierestä maanantaiaamuna.
+      </p>
+      <div class="status">🫡 Vedos valmiina sivulle upotettavaksi</div>
+    </section>
+
+    <section class="card">
+      <h2>Vuositaulukko</h2>
+      <p>Kalenteri painottaa kausiluonteisuutta, säätekijöitä, geopoliittista riskiä ja pitkille optioille sopivia seurantaikkunoita.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Hyödyke</th>
+              <th>Tammi</th>
+              <th>Helmi</th>
+              <th>Maalis</th>
+              <th>Huhti</th>
+              <th>Touko</th>
+              <th>Kesä</th>
+              <th>Heinä</th>
+              <th>Elo</th>
+              <th>Syys</th>
+              <th>Loka</th>
+              <th>Marras</th>
+              <th>Joulu</th>
+              <th>Sää / tapahtumat / muistiinpanot</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>☕ Kahvi</td>
+              <td class="watch">👀</td>
+              <td class="watch">👀</td>
+              <td class="entry">🟢 3M</td>
+              <td class="entry">🟢 C?</td>
+              <td class="watch">🌧️</td>
+              <td class="risk">❄️</td>
+              <td class="risk">❄️🌪️</td>
+              <td class="watch">👀</td>
+              <td class="watch">🌸</td>
+              <td class="entry">🟢</td>
+              <td class="watch">👀</td>
+              <td class="neutral">—</td>
+              <td>Brasilian sää, kukinta, kuivuus ja pakkasriski. Tänne voi kirjata satoarviot, myrskyt ja poikkeavat lämpöjaksot.</td>
+            </tr>
+            <tr>
+              <td>🍫 Kaakao</td>
+              <td class="watch">👀</td>
+              <td class="entry">🟢</td>
+              <td class="watch">👀</td>
+              <td class="risk">🎂 sesonki</td>
+              <td class="risk">⚠️</td>
+              <td class="watch">🌧️</td>
+              <td class="watch">👀</td>
+              <td class="entry">🟢</td>
+              <td class="entry">🟢 3M</td>
+              <td class="watch">🌧️</td>
+              <td class="risk">⚡</td>
+              <td class="watch">👀</td>
+              <td>Länsi-Afrikan sateet, tautiriski, satoraportit ja poliittinen tilanne. Kaakaossa nöyryys on joskus halvin vakuutus.</td>
+            </tr>
+            <tr>
+              <td>🌱 Soija</td>
+              <td class="watch">🇧🇷 sato</td>
+              <td class="watch">🇧🇷 sato</td>
+              <td class="entry">🟢</td>
+              <td class="entry">🟢 kylvö</td>
+              <td class="watch">🌧️</td>
+              <td class="watch">🔥</td>
+              <td class="risk">🔥🌪️</td>
+              <td class="risk">⚠️</td>
+              <td class="entry">🟢</td>
+              <td class="watch">👀</td>
+              <td class="neutral">—</td>
+              <td class="neutral">—</td>
+              <td>USA:n kylvö ja sää, Brasilian sato sekä Kiinan kysyntä. Tähän kohtaan sopivat myös myöhästyneet kylvöt ja kuivuusriskit.</td>
+            </tr>
+            <tr>
+              <td>🔥 Maakaasu</td>
+              <td class="danger">❄️ talvi</td>
+              <td class="danger">❄️</td>
+              <td class="watch">👀</td>
+              <td class="entry">🟢 varastot</td>
+              <td class="entry">🟢</td>
+              <td class="watch">⛽</td>
+              <td class="watch">⛽</td>
+              <td class="watch">👀</td>
+              <td class="entry">🟢 talven hinnoittelu</td>
+              <td class="risk">⚡</td>
+              <td class="danger">❄️</td>
+              <td class="danger">❄️</td>
+              <td>Varastot, talviennusteet, LNG-virrat ja geopoliittiset häiriöt. Tähän myös toimitusongelmat, kylmät aallot ja myrskyvaikutukset.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="legend">
+        <div class="legend-item"><span class="swatch neutral"></span><span>⚪ Neutraali – ei erityistä etua</span></div>
+        <div class="legend-item"><span class="swatch watch"></span><span>👀 Seuranta – tarkkaile tilannetta</span></div>
+        <div class="legend-item"><span class="swatch entry"></span><span>🟢 Mahdollinen ostoikkuna 3 kk optiolle</span></div>
+        <div class="legend-item"><span class="swatch risk"></span><span>⚠️ Kohonnut riski – varovaisuus</span></div>
+        <div class="legend-item"><span class="swatch danger"></span><span>🚨 Poikkeuksellinen riski / myrskyaika</span></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Selitteet ja muistiinpanot</h2>
+      <div class="info-grid">
+        <div class="mini-card">
+          <h3>Symbolit</h3>
+          <ul>
+            <li><strong>🌧️</strong> sateet / liiallinen kosteus</li>
+            <li><strong>🔥</strong> kuivuus / lämpöstressi</li>
+            <li><strong>❄️</strong> pakkas- tai kylmäriski</li>
+            <li><strong>🌪️</strong> myrskyt / poikkeava sää</li>
+            <li><strong>⚡</strong> geopoliittinen tai muu uutisriski</li>
+            <li><strong>3M</strong> pitkän option ikkuna</li>
+            <li><strong>C?</strong> mahdollinen call-ajatus</li>
+          </ul>
+        </div>
+
+        <div class="mini-card">
+          <h3>Jatkokehitys</h3>
+          <ul>
+            <li>Kuukauden automaattinen korostus nykyhetken mukaan</li>
+            <li>Tooltipit soluille hiiren päälle</li>
+            <li>Erillinen sääpäiväkirja hyödykkeittäin</li>
+            <li>Mahdollinen ylläpitonäkymä helppoa päivitystä varten</li>
+          </ul>
+        </div>
+
+        <div class="mini-card">
+          <h3>Markun muistiinpanot</h3>
+          <ul>
+            <li>Kahvi tuntuu helpoimmalta seurattavalta</li>
+            <li>Kaakao vaatii nöyryyttä trendiä vastaan</li>
+            <li>Soija vielä työn alla</li>
+            <li>Maakaasu kiinnostava mutta mutkikas tapaus</li>
+          </ul>
+        </div>
+      </div>
+      <p class="footer-note">Tämä tiedosto toimii sellaisenaan erillisenä sivuna tai upotettuna osaksi aimtrading.fi-sivustoa.</p>
+    </section>
+  </main>
+</body>
+</html>
