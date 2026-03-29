@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Delta Calculator</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; background: #f4f4f4; }
+    h1 { color: #333; }
+    label { display: block; margin-top: 20px; }
+    input { padding: 8px; width: 300px; margin-top: 5px; }
+    button { padding: 10px 20px; margin-top: 20px; cursor: pointer; }
+    #result { margin-top: 30px; font-size: 1.2em; }
+    .footer { margin-top: 50px; font-size: 0.9em; color: #666; }
+  </style>
+</head>
+<body>
+
+<p>
+<a href="index_en.html">🏠 Back to AIM Trading home page</a>
+</p>
+
+<h1>Delta Calculator</h1>
+<p>Enter the values and estimate the option Delta.</p>
+
+<label for="stockPrice">Underlying Price:</label>
+<input type="number" id="stockPrice" placeholder="e.g. 22461">
+
+<label for="strikePrice">Strike Price:</label>
+<input type="number" id="strikePrice" placeholder="e.g. 22600">
+
+<label for="iv">Volatility (%):</label>
+<input type="number" id="iv" placeholder="e.g. 18.15">
+
+<br>
+<button onclick="calculateDelta()">Calculate Delta</button>
+
+<div id="result"></div>
+
+<div class="footer">
+<p>Created by Markku and Joosef - numbers tell the story</p>
+</div>
+
+<script>
+function calculateDelta() {
+  const stockPrice = parseFloat(document.getElementById('stockPrice').value);
+  const strikePrice = parseFloat(document.getElementById('strikePrice').value);
+  const iv = parseFloat(document.getElementById('iv').value) / 100;
+
+  if (isNaN(stockPrice) || isNaN(strikePrice) || isNaN(iv)) {
+    document.getElementById('result').innerHTML = "<b>Please enter all values correctly!</b>";
+    return;
+  }
+
+  let moneyness = (stockPrice - strikePrice) / (stockPrice * iv);
+  let delta = 1 / (1 + Math.exp(-1.7 * moneyness));
+
+  delta = Math.min(Math.max(delta, 0), 1);
+
+  document.getElementById('result').innerHTML =
+    `<b>Estimated Delta:</b> ${delta.toFixed(3)}<br>` +
+    `This means approximately ${(delta * 100).toFixed(1)}% probability that the option expires profitable.`;
+}
+</script>
+
+</body>
+</html>
