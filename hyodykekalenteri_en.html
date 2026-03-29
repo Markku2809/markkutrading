@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIM Trading – Commodity Calendar</title>
+  <meta name="description" content="AIM Trading commodity calendar: coffee, cocoa, soybeans and natural gas in one clear yearly overview." />
+  <style>
+    :root {
+      --bg: #eef3f8;
+      --panel: #ffffff;
+      --panel-2: #f8fbff;
+      --text: #1f2937;
+      --muted: #5f6b7a;
+      --border: rgba(31, 41, 55, 0.10);
+      --neutral: #dbe4f0;
+      --watch: #d9ebff;
+      --entry: #d8f3dc;
+      --risk: #fff3cd;
+      --danger: #f8d7da;
+      --accent: #4f83ff;
+      --accent-2: #2f5fb3;
+      --shadow: 0 12px 30px rgba(0,0,0,0.08);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #f8fafc 0%, #eef3f8 100%);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .hero, .card {
+      background: linear-gradient(180deg, #ffffff, #f9fbfd);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      padding: 32px;
+      margin-bottom: 20px;
+    }
+
+    .back-link {
+      margin-bottom: 18px;
+    }
+
+    .back-link a {
+      color: var(--accent-2);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid rgba(79,131,255,0.18);
+      border-radius: 999px;
+      color: var(--accent-2);
+      background: rgba(79,131,255,0.08);
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+
+    h1, h2, h3 { margin: 0 0 12px; }
+
+    h1 {
+      font-size: clamp(30px, 5vw, 48px);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+
+    h2 {
+      font-size: 24px;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    h3 { color: var(--text); }
+
+    p {
+      margin: 0 0 12px;
+      color: var(--muted);
+      max-width: 900px;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(79,131,255,0.08);
+      border: 1px solid rgba(79,131,255,0.18);
+      color: var(--accent-2);
+      margin-top: 8px;
+      font-size: 14px;
+    }
+
+    .card {
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1180px;
+      background: #ffffff;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 10px 8px;
+      text-align: center;
+      vertical-align: middle;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: #edf3fb;
+      color: var(--text);
+    }
+
+    th:first-child,
+    td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      text-align: left;
+      min-width: 140px;
+      font-weight: 700;
+      background: #f4f7fb;
+    }
+
+    thead th:first-child { z-index: 3; }
+
+    th:last-child,
+    td:last-child {
+      min-width: 300px;
+      text-align: left;
+    }
+
+    .neutral { background: var(--neutral); }
+    .watch { background: var(--watch); }
+    .entry { background: var(--entry); animation: pulse 2.3s infinite; }
+    .risk { background: var(--risk); }
+    .danger { background: var(--danger); animation: pulse 1.8s infinite; }
+
+    .now {
+      outline: 3px solid var(--accent);
+      outline-offset: -3px;
+      font-weight: 700;
+    }
+
+    .legend,
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .legend-item,
+    .mini-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .swatch {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid rgba(0,0,0,0.08);
+      flex: 0 0 auto;
+    }
+
+    ul {
+      margin: 8px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+    }
+
+    code {
+      background: rgba(79,131,255,0.08);
+      padding: 2px 6px;
+      border-radius: 6px;
+      color: var(--accent-2);
+    }
+
+    .footer-note {
+      font-size: 13px;
+      color: #6b7280;
+      margin-top: 10px;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: inset 0 0 0 0 rgba(255,255,255,0.00); }
+      50% { box-shadow: inset 0 0 0 999px rgba(255,255,255,0.18); }
+    }
+
+    @media (max-width: 768px) {
+      .container { padding: 16px; }
+      .hero, .card { padding: 18px; border-radius: 18px; }
+      h2 { font-size: 20px; }
+      th, td { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="hero">
+      <div class="back-link">
+        <a href="index_en.html">🏠 Back to AIM Trading home page</a>
+      </div>
+
+      <div class="eyebrow">📈 AIM Trading</div>
+      <h1>Commodity Calendar</h1>
+      <p>
+        A clear yearly overview for coffee, cocoa, soybeans and natural gas. The goal is not to pretend to have a crystal ball,
+        but to offer a calm map: when to watch, when to consider a buying window, and when it may be wiser to keep your fingers
+        away from the button like keeping a coffee cup away from the keyboard on a Monday morning.
+      </p>
+      <div class="status">🫡 Draft ready to be embedded on the site</div>
+    </section>
+
+    <section class="card">
+      <h2>Yearly Table</h2>
+      <p>The calendar highlights seasonality, weather factors, geopolitical risk and observation windows suitable for longer-dated options.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Commodity</th>
+              <th>Jan</th>
+              <th>Feb</th>
+              <th>Mar</th>
+              <th>Apr</th>
+              <th>May</th>
+              <th>Jun</th>
+              <th>Jul</th>
+              <th>Aug</th>
+              <th>Sep</th>
+              <th>Oct</th>
+              <th>Nov</th>
+              <th>Dec</th>
+              <th>Weather / events / notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>☕ Coffee</td>
+              <td class="watch">👀</td>
+              <td class="watch">👀</td>
+              <td class="entry">🟢 3M</td>
+              <td class="entry">🟢 C?</td>
+              <td class="watch">🌧️</td>
+              <td class="risk">❄️</td>
+              <td class="risk">❄️🌪️</td>
+              <td class="watch">👀</td>
+              <td class="watch">🌸</td>
+              <td class="entry">🟢</td>
+              <td class="watch">👀</td>
+              <td class="neutral">—</td>
+              <td>Brazilian weather, flowering, drought and frost risk. This is a good place to note crop estimates, storms and unusual temperature periods.</td>
+            </tr>
+            <tr>
+              <td>🍫 Cocoa</td>
+              <td class="watch">👀</td>
+              <td class="entry">🟢</td>
+              <td class="watch">👀</td>
+              <td class="risk">🎂 season</td>
+              <td class="risk">⚠️</td>
+              <td class="watch">🌧️</td>
+              <td class="watch">👀</td>
+              <td class="entry">🟢</td>
+              <td class="entry">🟢 3M</td>
+              <td class="watch">🌧️</td>
+              <td class="risk">⚡</td>
+              <td class="watch">👀</td>
+              <td>West African rains, disease risk, crop reports and the political situation. In cocoa, humility is sometimes the cheapest insurance policy.</td>
+            </tr>
+            <tr>
+              <td>🌱 Soybeans</td>
+              <td class="watch">🇧🇷 harvest</td>
+              <td class="watch">🇧🇷 harvest</td>
+              <td class="entry">🟢</td>
+              <td class="entry">🟢 planting</td>
+              <td class="watch">🌧️</td>
+              <td class="watch">🔥</td>
+              <td class="risk">🔥🌪️</td>
+              <td class="risk">⚠️</td>
+              <td class="entry">🟢</td>
+              <td class="watch">👀</td>
+              <td class="neutral">—</td>
+              <td class="neutral">—</td>
+              <td>US planting and weather, Brazilian harvest and Chinese demand. Delayed planting and drought risks also fit here well.</td>
+            </tr>
+            <tr>
+              <td>🔥 Natural Gas</td>
+              <td class="danger">❄️ winter</td>
+              <td class="danger">❄️</td>
+              <td class="watch">👀</td>
+              <td class="entry">🟢 storage</td>
+              <td class="entry">🟢</td>
+              <td class="watch">⛽</td>
+              <td class="watch">⛽</td>
+              <td class="watch">👀</td>
+              <td class="entry">🟢 winter pricing</td>
+              <td class="risk">⚡</td>
+              <td class="danger">❄️</td>
+              <td class="danger">❄️</td>
+              <td>Storage levels, winter forecasts, LNG flows and geopolitical disruptions. Delivery problems, cold waves and storm impacts belong here too.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="legend">
+        <div class="legend-item"><span class="swatch neutral"></span><span>⚪ Neutral – no special edge</span></div>
+        <div class="legend-item"><span class="swatch watch"></span><span>👀 Watch – monitor the situation</span></div>
+        <div class="legend-item"><span class="swatch entry"></span><span>🟢 Possible buying window for a 3-month option</span></div>
+        <div class="legend-item"><span class="swatch risk"></span><span>⚠️ Elevated risk – caution</span></div>
+        <div class="legend-item"><span class="swatch danger"></span><span>🚨 Exceptional risk / storm period</span></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Explanations and Notes</h2>
+      <div class="info-grid">
+        <div class="mini-card">
+          <h3>Symbols</h3>
+          <ul>
+            <li><strong>🌧️</strong> rain / excessive moisture</li>
+            <li><strong>🔥</strong> drought / heat stress</li>
+            <li><strong>❄️</strong> frost or cold risk</li>
+            <li><strong>🌪️</strong> storms / unusual weather</li>
+            <li><strong>⚡</strong> geopolitical or other news risk</li>
+            <li><strong>3M</strong> long option window</li>
+            <li><strong>C?</strong> possible call idea</li>
+          </ul>
+        </div>
+
+        <div class="mini-card">
+          <h3>Further Development</h3>
+          <ul>
+            <li>Automatic highlighting of the current month</li>
+            <li>Tooltips for cells on mouse hover</li>
+            <li>A separate weather diary by commodity</li>
+            <li>A possible maintenance view for easier updating</li>
+          </ul>
+        </div>
+
+        <div class="mini-card">
+          <h3>Markku's Notes</h3>
+          <ul>
+            <li>Coffee feels the easiest to follow</li>
+            <li>Cocoa requires humility against the trend</li>
+            <li>Soybeans are still a work in progress</li>
+            <li>Natural gas is interesting but complicated</li>
+          </ul>
+        </div>
+      </div>
+      <p class="footer-note">This file works as a standalone page or as part of the aimtrading.fi website.</p>
+    </section>
+  </main>
+</body>
+</html>
