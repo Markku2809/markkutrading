@@ -7,13 +7,13 @@
     "Hinta 7447.50 suhteessa EMA20-tasoon 7455.29 ja EMA50-tasoon 7460.12.",
     "30 minuutin RSI(14) on 48.9.",
     "Viimeisimmän 30 minuutin muutoksen suunta on +0.00 %.",
-    "Hintadatan ikä on 37.2 tuntia.",
+    "Hintadatan ikä on 37.4 tuntia.",
     "Vanha hinta ei oikeuta call- tai put-setupia."
   ],
   "rise_scenario": "Noususkenaario vahvistuu, jos US500-futuuri pysyy EMA20:n (7455.29) yläpuolella ja murtaa lasketun vastuksen 7496.50.",
   "fall_scenario": "Laskuskenaario vahvistuu, jos hinta jää EMA20:n (7455.29) alle ja rikkoo lasketun tuen 7431.50.",
   "invalidation": "Odota tuoretta hintaa ja selkeää rakennetta.",
-  "generated_at": "2026-07-26T13:13:27.639376+03:00",
+  "generated_at": "2026-07-26T13:26:34.971202+03:00",
   "instrument": "ES=F (US500/S&P 500 E-mini -viitefutuuri; ei varmennettu IG-instrumentti)",
   "price_time": "2026-07-24T20:59:59+00:00",
   "support": 7431.5,
@@ -60,9 +60,11 @@
       "published_at": "reaaliaikainen graafilähde"
     }
   ],
+  "analyst_views": [],
   "ig_note": "IG:n US500-instrumenttia ei ole varmennettu. Älä käytä viitetasoja sellaisenaan toimeksiantoon.",
   "errors": [
-    "Uutiset: Expecting value: line 1 column 1 (char 0)"
+    "Uutiset: HTTP Error 429: Too Many Requests",
+    "Analyytikot: HTTP Error 429: Too Many Requests"
   ],
   "disclaimer": "Ei sijoitusneuvontaa. Ei tuotto- tai riskittömyystakuuta. Kauppaa ei suoriteta käyttäjän puolesta."
 }
