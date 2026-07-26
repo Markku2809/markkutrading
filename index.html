@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AIM Trading</title>
+  <title>AIM Trading</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -13,7 +13,7 @@
     }
 
     header {
-      background-color: #2d6a4f; /* murrettu vihreä */
+      background-color: #2d6a4f;
       color: white;
       padding: 20px;
       text-align: center;
@@ -42,13 +42,35 @@
     }
 
     h1 { margin-top: 0; }
-
-    .section {
-      margin-bottom: 40px;
+    .section { margin-bottom: 40px; }
+    .images {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
     }
-    .images { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-    .images img { width: 100%; max-width: 380px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-    footer { background-color: #eee; text-align: center; padding: 10px; font-size: 14px; color: #444; }
+    .images img {
+      width: 100%;
+      max-width: 380px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    footer {
+      background-color: #eee;
+      text-align: center;
+      padding: 10px;
+      font-size: 14px;
+      color: #444;
+    }
+
+    @keyframes scroll-left {
+      0% {
+        transform: translateX(100%);
+      }
+      100% {
+        transform: translateX(-100%);
+      }
+    }
   </style>
 </head>
 <body>
@@ -62,7 +84,14 @@
     </div>
   </header>
 
-  <!-- TradingView Mini Ticker LV -->
+  <section style="max-width:800px;margin:22px auto;padding:24px;text-align:center;background:linear-gradient(135deg,#153f30,#2d6a4f);color:white;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.18);">
+    <div style="font-size:14px;letter-spacing:.08em;text-transform:uppercase;opacity:.8;">Dienas tirgus apskats</div>
+    <h2 style="margin:8px 0 6px;font-size:30px;">Rīta apskats</h2>
+    <p style="margin:0 0 18px;opacity:.9;">Skatiet aktuālos cenu datus, tehnisko struktūru, avotus un vienu skaidru secinājumu.</p>
+    <a href="rita-analize.html" style="display:inline-block;background:#33d69f;color:#073126;padding:14px 24px;border-radius:10px;text-decoration:none;font-weight:800;">Atvērt rīta analīzi</a>
+  </section>
+
+  <!-- TradingView Mini Ticker -->
   <div class="tradingview-widget-container" style="margin-top: -10px; margin-bottom: 20px;">
     <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js">
     {
@@ -76,97 +105,187 @@
       "colorTheme": "light",
       "isTransparent": false,
       "displayMode": "adaptive",
-      "locale": "lv"
+      "locale": "fi"
     }
     </script>
   </div>
-  <!-- TradingView Mini Ticker END -->
 
-  <main>
+<!-- 📊 Markun tarkkailulista (liikkuva + linkit + pysähtyy) -->
+<div class="ticker-container">
+  <h3 style="text-align: center;">📊 Markku novērošanas saraksts</h3>
+  <div class="ticker-content">
+    <span><a href="https://www.tradingview.com/symbols/NASDAQ-NVDA/" target="_blank"><strong>NVDA</strong></a> $845.00 <span style="color: green;">▲ 1.23%</span></span>
+    <span><a href="https://www.tradingview.com/symbols/NASDAQ-TSLA/" target="_blank"><strong>TSLA</strong></a> $172.30 <span style="color: red;">▼ 0.85%</span></span>
+    <span><a href="https://www.tradingview.com/symbols/TSE-M3/" target="_blank"><strong>M3</strong></a> ¥2,145.50 <span style="color: green;">▲ 0.42%</span></span>
+    <span><a href="https://www.tradingview.com/symbols/NASDAQ-AMD/" target="_blank"><strong>AMD</strong></a> $165.70 <span style="color: green;">▲ 1.11%</span></span>
+    <span><a href="https://www.tradingview.com/symbols/OMXHEX-NESTE/" target="_blank"><strong>NESTE.HE</strong></a> €26.42 <span style="color: red;">▼ 0.20%</span></span>
+  </div>
+</div>
+
+<style>
+.ticker-container {
+  background-color: #f2f2f2;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  overflow: hidden;
+  font-family: sans-serif;
+  white-space: nowrap;
+}
+.ticker-content {
+  display: inline-block;
+  animation: scroll-left 25s linear infinite;
+}
+.ticker-container:hover .ticker-content {
+  animation-play-state: paused;
+}
+.ticker-content span {
+  display: inline-block;
+  margin-right: 40px;
+}
+.ticker-content a {
+  text-decoration: none;
+  color: black;
+}
+</style>
+<!-- 💎 Hyödykebanneri (pyörivä + linkit + pysähtyy) -->
+<div class="ticker-container">
+  <h3 style="text-align: center;">💎 Izejvielu tirgi</h3>
+  <div class="ticker-content">
+    <span><a href="https://www.tradingview.com/symbols/OANDA-XAUUSD/" target="_blank"><strong>Zelts</strong></a> $2342.50 <span style="color: green;">▲ 0.45%</span></span>
+    <span><a href="https://www.tradingview.com/symbols/OANDA-XCUUSD/" target="_blank"><strong>Varš</strong></a> $4.25 <span style="color: red;">▼ 0.20%</span></span>
+    <span><a href="https://www.tradingview.com/symbols/OANDA-XPDUSD/" target="_blank"><strong>Pallādijs</strong></a> $1050.30 <span style="color: green;">▲ 1.05%</span></span>
+    <span><a href="https://www.tradingview.com/symbols/OANDA-XPTUSD/" target="_blank"><strong>Platīns</strong></a> $968.80 <span style="color: red;">▼ 0.32%</span></span>
+    <span><a href="https://www.tradingview.com/symbols/OANDA-UKOIL/" target="_blank"><strong>Nafta (Brent)</strong></a> $89.20 <span style="color: green;">▲ 0.91%</span></span>
+  </div>
+</div>
+
+<style>
+.ticker-container {
+  background-color: #e6f2ff;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  overflow: hidden;
+  font-family: sans-serif;
+  white-space: nowrap;
+}
+.ticker-content {
+  display: inline-block;
+  animation: scroll-left 28s linear infinite;
+}
+.ticker-container:hover .ticker-content {
+  animation-play-state: paused;
+}
+.ticker-content span {
+  display: inline-block;
+  margin-right: 40px;
+}
+.ticker-content a {
+  text-decoration: none;
+  color: black;
+}
+</style>
+<main>
     <div class="section">
       <h2>Laipni lūdzam</h2>
-      <p>Mēs esam neliels un veikls tirdzniecības birojs Ventspilī, kas koncentrējas uz akciju un preču tirgiem. Mēs ikdienā tirgojam zeltu, kakao, akciju indeksus un citus globālos instrumentus.</p>
+      <p>Mēs esam neliels un dinamisks tirdzniecības birojs Ventspilī, kas koncentrējas uz akciju un izejvielu tirgiem. Ik dienu sekojam zeltam, kakao, akciju indeksiem un citiem globāliem instrumentiem.</p>
     </div>
 
     <div class="section">
       <h2>Mūsu pieeja</h2>
-      <p>Mēs izmantojam tehnisko analīzi, piemēram, RSI, slīdošos vidējos rādītājus, apjomu interpretāciju un ziņu uzraudzību – apvienojumā ar pieredzi un intuīciju. Mūsu mērķis ir mācīt un iedvesmot jaunos tirgotājus.</p>
+      <p>Mēs apvienojam tehnisko analīzi — RSI, slīdošos vidējos rādītājus, apjoma interpretāciju un ziņu uzraudzību — ar pieredzi un intuīciju. Šī vietne ir mana personīgā tirdzniecības darba vide.</p>
     </div>
 
     <div class="section">
-      <h2>Fotoattēli un noskaņa</h2>
+      <h2>Biroja noskaņa</h2>
       <div class="images">
-        <img src="https://i.imgur.com/wGHcCQa.jpeg" alt="Markku treido Skilling">
+        <img src="https://i.imgur.com/wGHcCQa.jpeg" alt="Markku tirgo ar Skilling">
+        <img src="toimiston-markkinanakyma.png" alt="Biroja tirgus skats un S&P 500 siltuma karte">
       </div>
     </div>
 
+    <section style="max-width:800px;margin:22px auto 28px;padding:22px 24px;background:linear-gradient(135deg,#3d3215,#79601e);color:#fff;border:1px solid #a98a37;border-radius:15px;box-shadow:0 8px 24px rgba(61,50,21,.22);display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:240px;">
+        <div style="font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#f4d77b;">Svarīgākie tirgus datumi</div>
+        <h2 style="margin:6px 0 5px;font-size:28px;">📅 Izejvielu kalendārs</h2>
+        <p style="margin:0;color:#f4ead0;line-height:1.5;">Pirms tirdzniecības pārbaudiet svarīgos zelta, naftas, vara un citu izejvielu datumus.</p>
+      </div>
+      <a href="hyodykekalenteri_lv.html" style="display:inline-block;background:#f4d77b;color:#342a12;padding:13px 20px;border-radius:10px;text-decoration:none;font-weight:800;white-space:nowrap;">Atvērt kalendāru →</a>
+    </section>
+
     <div class="section">
-      <h2>Kontaktinformācija</h2>
+      <h2>Tirgi un kalnrūpniecība</h2>
+      <p>Zelts un Rio Tinto ir redzami blakus kompaktā skatā. Mobilajā ierīcē grafiki novietojas viens zem otra.</p>
+      <style>
+        .compact-chart-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+        .compact-chart-card { min-width:0; background:#f8faf9; border:1px solid #dce6e1; border-radius:12px; padding:12px; }
+        .compact-chart-card h3 { margin:0 0 10px; text-align:center; }
+        @media (max-width:760px) { .compact-chart-grid { grid-template-columns:1fr; } }
+      </style>
+      <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+      <div class="compact-chart-grid">
+        <div class="compact-chart-card">
+          <h3>Zelts</h3>
+          <div id="tradingview_markkukulta"></div>
+        </div>
+        <div class="compact-chart-card">
+          <h3>Rio Tinto</h3>
+          <div id="tradingview_riotinto"></div>
+        </div>
+      </div>
+      <script type="text/javascript">
+        new TradingView.widget({"width":"100%","height":360,"symbol":"OANDA:XAUUSD","interval":"60","timezone":"Etc/UTC","theme":"light","style":"1","locale":"lv","toolbar_bg":"#f1f3f6","enable_publishing":false,"hide_side_toolbar":true,"allow_symbol_change":true,"container_id":"tradingview_markkukulta"});
+        new TradingView.widget({"width":"100%","height":360,"symbol":"NYSE:RIO","interval":"D","timezone":"Etc/UTC","theme":"light","style":"1","locale":"lv","toolbar_bg":"#f1f3f6","enable_publishing":false,"hide_side_toolbar":true,"allow_symbol_change":true,"container_id":"tradingview_riotinto"});
+      </script>
+    </div>
+
+    <div class="section">
+      <h2>Tirdzniecības piezīmes</h2>
+      <p>Brīvi pierakstiet dienas darījumus, sajūtas, idejas vai jebko citu. Teksts automātiski tiek saglabāts jūsu pārlūkprogrammā.</p>
+      <textarea id="hoylynpolyn-laatikko" rows="12" cols="100" placeholder="Rakstiet savas piezīmes šeit..."></textarea>
+      <br><br>
+    </div>
+
+    <script>
+      const laatikko = document.getElementById("hoylynpolyn-laatikko");
+      laatikko.value = localStorage.getItem("hoylynpolyn_sisalto") || "";
+      laatikko.addEventListener("input", () => {
+        localStorage.setItem("hoylynpolyn_sisalto", laatikko.value);
+      });
+    </script>
+
+    <div class="section">
+      <div style="text-align: center; margin-top: 30px;">
+  <a href="deltamittari_lv.html" style="font-size: 20px; background-color: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px;">Atvērt Delta kalkulatoru</a>
+  <a href="iv-kalkulators.html" style="display:inline-block;font-size:20px;background-color:#6f42c1;color:white;padding:12px 24px;margin:10px;text-decoration:none;border-radius:8px;font-weight:bold;">Opciju IV kalkulators</a>
+</div>
+      <a href="https://aimtrading.fi/popmalaskuri.html">
+  <button style="background-color: #007bff; color: white; padding: 10px 20px; margin: 10px; border: none; border-radius: 5px; cursor: pointer;">
+    Atvērt POP-MA kalkulatoru
+  </button>
+</a>
+      <h2>Tirdzniecības žurnāls</h2>
+      <p>📘 <a href="paivakirja.html">Atvērt tirdzniecības žurnālu</a> – sekojiet ikdienas opcijām un atziņām!</p>
+ </div>    
+    <div class="section">
+      <h2>Kontakti</h2>
       <p>E-pasts: <strong>markkuinvest@gmail.com</strong><br>
       Atrašanās vieta: Ventspils, Latvija</p>
     </div>
+
   </main>
 
   <footer>
     &copy; 2025 AIM Trading – Mākslīgā intelekta un Markku sadarbība tirgos
+    <footer style="font-size: 0.9em; color: #666; text-align: center; margin-top: 40px;">
+  AIM Trading ir personīgai lietošanai paredzēts palīgrīks. 
+  Saturs ir vispārīgs un nav ieguldījumu konsultācija. 
+  Mēs nepārvaldām citu personu līdzekļus un nepiedāvājam aktīvu pārvaldīšanu.
+</footer>
   </footer>
 
-  <!-- TradingView Gold -->
-  <div class="tradingview-widget-container">
-    <div id="tradingview_zelts_lv"></div>
-    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-    <script type="text/javascript">
-      new TradingView.widget({
-        "width": 800,
-        "height": 500,
-        "symbol": "OANDA:XAUUSD",
-        "interval": "60",
-        "timezone": "Etc/UTC",
-        "theme": "light",
-        "style": "1",
-        "locale": "lv",
-        "toolbar_bg": "#f1f3f6",
-        "enable_publishing": false,
-        "hide_side_toolbar": false,
-        "allow_symbol_change": true,
-        "container_id": "tradingview_zelts_lv"
-      });
-    </script>
-  </div>
-
-  <!-- TradingView S&P 500 -->
-  <div class="tradingview-widget-container">
-    <div id="tradingview_sp500_lv"></div>
-    <script type="text/javascript">
-      new TradingView.widget({
-        "width": 800,
-        "height": 500,
-        "symbol": "OANDA:SPX500USD",
-        "interval": "60",
-        "timezone": "Etc/UTC",
-        "theme": "light",
-        "style": "1",
-        "locale": "lv",
-        "toolbar_bg": "#f1f3f6",
-        "enable_publishing": false,
-        "hide_side_toolbar": false,
-        "allow_symbol_change": true,
-        "container_id": "tradingview_sp500_lv"
-      });
-    </script>
-  </div>
-<div style="text-align: center; margin-top: 20px;">
-  <a href="deltamittari_lv.html" style="margin-right: 20px;">📊 Delta kalkulators</a>
-  <a href="hyodykekalenteri_lv.html">📅 Izejvielu kalendārs</a>
-</div>
- </div>
-
- <footer style="font-size: 0.9em; color: #666; text-align: center; margin-top: 40px;">
-   AIM Trading ir personīgai lietošanai paredzēts palīgrīks. 
-   Saturs ir vispārīga rakstura un nav investīciju konsultācija. 
-  Mēs nepārvaldām citu personu līdzekļus un nepiedāvājam aktīvu pārvaldīšanas pakalpojumus.
- </footer>
-
- </body>
 </body>
 </html>
