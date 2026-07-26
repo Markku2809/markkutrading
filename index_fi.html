@@ -213,79 +213,29 @@
     </div>
 
     <div class="section">
-      <h2>Markkinat</h2>
-
-      <!-- TradingView Kulta -->
-      <div class="tradingview-widget-container">
-        <div id="tradingview_markkukulta"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-        <script type="text/javascript">
-          new TradingView.widget({
-            "width": 800,
-            "height": 500,
-            "symbol": "OANDA:XAUUSD",
-            "interval": "60",
-            "timezone": "Etc/UTC",
-            "theme": "light",
-            "style": "1",
-            "locale": "fi",
-            "toolbar_bg": "#f1f3f6",
-            "enable_publishing": false,
-            "hide_side_toolbar": false,
-            "allow_symbol_change": true,
-            "container_id": "tradingview_markkukulta"
-          });
-        </script>
+      <h2>Markkinat ja kaivosyhtiö</h2>
+      <p>Kulta ja Rio Tinto näkyvät nyt rinnakkain kompaktissa näkymässä. Mobiilissa graafit asettuvat allekkain.</p>
+      <style>
+        .compact-chart-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+        .compact-chart-card { min-width:0; background:#f8faf9; border:1px solid #dce6e1; border-radius:12px; padding:12px; }
+        .compact-chart-card h3 { margin:0 0 10px; text-align:center; }
+        @media (max-width:760px) { .compact-chart-grid { grid-template-columns:1fr; } }
+      </style>
+      <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+      <div class="compact-chart-grid">
+        <div class="compact-chart-card">
+          <h3>Kulta</h3>
+          <div id="tradingview_markkukulta"></div>
+        </div>
+        <div class="compact-chart-card">
+          <h3>Rio Tinto</h3>
+          <div id="tradingview_riotinto"></div>
+        </div>
       </div>
-
-      <!-- TradingView S&P 500 -->
-      <div class="tradingview-widget-container" style="margin-top: 30px;">
-        <div id="tradingview_sp500"></div>
-        <script type="text/javascript">
-          new TradingView.widget({
-            "width": 800,
-            "height": 500,
-            "symbol": "OANDA:SPX500USD",
-            "interval": "60",
-            "timezone": "Etc/UTC",
-            "theme": "light",
-            "style": "1",
-            "locale": "fi",
-            "toolbar_bg": "#f1f3f6",
-            "enable_publishing": false,
-            "hide_side_toolbar": false,
-            "allow_symbol_change": true,
-            "container_id": "tradingview_sp500"
-          });
-        </script>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>Kaivosyhtiöt</h2>
-      <p>Tarkastelemme kahden kaivosyhtiön, Rio Tinton ja 80 Mile Plc:n (ent. Bluejay Mining), kehitystä. Näiden yhtiöiden toiminta liittyy vahvasti raaka-aineisiin, kuten kupariin, alumiiniin ja harvinaisiin maametalleihin.</p>
-
-      <!-- TradingView Rio Tinto -->
-      <div class="tradingview-widget-container">
-        <div id="tradingview_riotinto"></div>
-        <script type="text/javascript">
-          new TradingView.widget({
-            "width": 800,
-            "height": 500,
-            "symbol": "NYSE:RIO",
-            "interval": "D",
-            "timezone": "Etc/UTC",
-            "theme": "light",
-            "style": "1",
-            "locale": "fi",
-            "toolbar_bg": "#f1f3f6",
-            "enable_publishing": false,
-            "hide_side_toolbar": false,
-            "allow_symbol_change": true,
-            "container_id": "tradingview_riotinto"
-          });
-        </script>
-      </div>
+      <script type="text/javascript">
+        new TradingView.widget({"width":"100%","height":360,"symbol":"OANDA:XAUUSD","interval":"60","timezone":"Etc/UTC","theme":"light","style":"1","locale":"fi","toolbar_bg":"#f1f3f6","enable_publishing":false,"hide_side_toolbar":true,"allow_symbol_change":true,"container_id":"tradingview_markkukulta"});
+        new TradingView.widget({"width":"100%","height":360,"symbol":"NYSE:RIO","interval":"D","timezone":"Etc/UTC","theme":"light","style":"1","locale":"fi","toolbar_bg":"#f1f3f6","enable_publishing":false,"hide_side_toolbar":true,"allow_symbol_change":true,"container_id":"tradingview_riotinto"});
+      </script>
     </div>
 
     <div class="section">
