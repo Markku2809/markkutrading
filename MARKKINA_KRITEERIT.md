@@ -30,7 +30,10 @@ Anna aina täsmälleen yksi lopputulos:
 7. **Laskuskenaario:** mitä hinnan pitää tehdä, jotta lasku vahvistuu.
 8. **Näkemyksen mitätöinti:** mikä hintaliike tekee annetusta suuntanäkemyksestä väärän.
 9. **Muut markkinat:** S&P 500 käteinen, Nasdaq 100, kulta ja DAX taustakuvan saamiseksi.
-10. **Tuoreet lähteet:** lähteen nimi, linkki ja julkaisu- tai havaintoaika.
+10. **Analyytikkojen näkemys:** tuoreet US500/S&P 500 -analyytikko- tai strateginäkemykset, lähde, linkki ja julkaisuajankohta. Jos niitä ei löydy, ilmoita se; älä keksi näkemystä.
+11. **Tuoreet lähteet:** lähteen nimi, linkki ja julkaisu- tai havaintoaika.
+
+Analyytikkojen näkemys on taustatietoa. Jos se on ristiriidassa hinnan kanssa, hinta voittaa.
 
 ## Instrumenttirajaus
 
