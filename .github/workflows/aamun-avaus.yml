@@ -1,0 +1,74 @@
+name: Päivitä aamun avaus
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "15 5 * * 1-5"
+
+permissions:
+  contents: write
+
+jobs:
+  update-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Hae hintadata ja rakenna analyysi
+        run: |
+          python - <<'PY'
+          import json, math, os, urllib.parse, urllib.request
+          from datetime import datetime, timezone
+          from zoneinfo import ZoneInfo
+
+          UA={"User-Agent":"Mozilla/5.0 AIMTrading/1.0"}
+          def get_json(url):
+              req=urllib.request.Request(url,headers=UA)
+              with urllib.request.urlopen(req,timeout=25) as r:return json.load(r)
+          def ema(xs,n):
+              a=2/(n+1); v=xs[0]
+              for x in xs[1:]:v=x*a+v*(1-a)
+              return v
+          def rsi(xs,n=14):
+              dif=[b-a for a,b in zip(xs,xs[1:])][-n:]
+              up=sum(max(x,0) for x in dif)/n; dn=sum(max(-x,0) for x in dif)/n
+              return 100 if dn==0 else 100-(100/(1+up/dn))
+          def market(symbol,name):
+              u="https://query1.finance.yahoo.com/v8/finance/chart/"+urllib.parse.quote(symbol,safe="")+"?range=6mo&interval=1d"
+              d=get_json(u)["chart"]["result"][0]; q=d["indicators"]["quote"][0]
+              rows=[(t,c,h,l) for t,c,h,l in zip(d["timestamp"],q["close"],q["high"],q["low"]) if None not in (c,h,l)]
+              ts,cl,hi,lo=zip(*rows); closes=list(cl); last=closes[-1]; prev=closes[-2]
+              return {"name":name,"symbol":symbol,"price":round(last,2),"change_pct":round((last/prev-1)*100,2),"ema20":ema(closes[-60:],20),"ema50":ema(closes[-100:],50),"rsi14":rsi(closes),"support":min(lo[-20:]),"resistance":max(hi[-20:]),"time":datetime.fromtimestamp(ts[-1],timezone.utc)}
+
+          now=datetime.now(ZoneInfo("Europe/Helsinki")); errors=[]; markets=[]
+          for symbol,name in [("GC=F","Kulta"),("^GSPC","S&P 500"),("^NDX","Nasdaq 100"),("^GDAXI","DAX")]:
+              try:markets.append(market(symbol,name))
+              except Exception as e:errors.append(name+": "+str(e))
+          decision="epäselvä – ei treidiä"; summary="Tuore tai riittävän yksiselitteinen hintanäyttö puuttuu."
+          primary=next((m for m in markets if m["symbol"]=="GC=F"),None)
+          if primary:
+              age=(datetime.now(timezone.utc)-primary["time"]).total_seconds()/3600
+              bull=sum([primary["price"]>primary["ema20"],primary["ema20"]>primary["ema50"],primary["change_pct"]>0,50<=primary["rsi14"]<=72])
+              bear=sum([primary["price"]<primary["ema20"],primary["ema20"]<primary["ema50"],primary["change_pct"]<0,28<=primary["rsi14"]<50])
+              if age<=72 and bull>=3 and bear<=1:decision="call-setup nyt";summary="Kullan viitefutuurin hinta- ja momenttirakenne tukevat noususuuntaa. Varmista toteutustaso omasta instrumentista."
+              elif age<=72 and bear>=3 and bull<=1:decision="put-setup nyt";summary="Kullan viitefutuurin hinta- ja momenttirakenne tukevat laskusuuntaa. Varmista toteutustaso omasta instrumentista."
+              elif age<=72:summary="Kullan hintarakenne ja momentti ovat ristiriidassa."
+          sources=[{"title":"Yahoo Finance chart API – GC=F","url":"https://finance.yahoo.com/quote/GC=F/","published_at":primary["time"].isoformat() if primary else "ei saatavilla"},{"title":"TradingView – Gold Futures","url":"https://www.tradingview.com/symbols/COMEX-GC1!/","published_at":"reaaliaikainen graafilähde"}]
+          try:
+              query=urllib.parse.quote('(gold OR "Federal Reserve" OR inflation) sourcecountry:US')
+              news=get_json("https://api.gdeltproject.org/api/v2/doc/doc?query="+query+"&mode=ArtList&maxrecords=6&format=json&timespan=24h")
+              for a in news.get("articles",[])[:6]:sources.append({"title":a.get("title","Markkinauutinen"),"url":a.get("url",""),"published_at":a.get("seendate","")})
+          except Exception as e:errors.append("Uutiset: "+str(e))
+          out={"decision":decision,"summary":summary,"generated_at":now.isoformat(),"instrument":"GC=F (Yahoo Finance -viitefutuuri; ei varmennettu IG-instrumentti)","price_time":primary["time"].isoformat() if primary else "ei saatavilla","support":round(primary["support"],2) if primary else None,"resistance":round(primary["resistance"],2) if primary else None,"rsi14":round(primary["rsi14"],1) if primary else None,"markets":[{"name":m["name"],"price":m["price"],"change_pct":m["change_pct"]} for m in markets],"sources":sources,"ig_note":"IG-instrumenttia ei ole varmennettu. Älä käytä viitetasoja sellaisenaan toimeksiantoon.","errors":errors,"disclaimer":"Ei sijoitusneuvontaa. Ei tuotto- tai riskittömyystakuuta. Kauppaa ei suoriteta käyttäjän puolesta."}
+          os.makedirs("data",exist_ok=True)
+          with open("data/aamun-avaus.json","w",encoding="utf-8") as f:json.dump(out,f,ensure_ascii=False,indent=2)
+          PY
+      - name: Tallenna päivitetty analyysi
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/aamun-avaus.json
+          git diff --cached --quiet || git commit -m "Päivitä aamun avaus"
+          git push
