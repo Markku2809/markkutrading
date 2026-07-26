@@ -1,4 +1,4 @@
-OANDA:XAUUSD<!doctype html>
+<!doctype html>
 <html lang="fi">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -13,7 +13,7 @@ OANDA:XAUUSD<!doctype html>
 <button class="open" id="open" type="button">Näytä aamuanalyysi</button>
 <section id="panel" hidden aria-live="polite"><div class="card"><div id="status" class="muted">Ladataan viimeisintä analyysiä…</div></div></section>
 <div class="card warning"><strong>Rajaus</strong><p>Automaattinen pääinstrumentti on Yahoo Finance -viitefutuuri GC=F. Se ei ole varmennettu sama IG-instrumentti. Vertaa hinnat ja tasot aina omaan välittäjääsi. Sivusto ei tee kauppoja.</p></div>
-<div class="chart"><div class="tradingview-widget-container" style="height:100%;width:100%"><div class="tradingview-widget-container__widget" style="height:calc(100% - 32px);width:100%"></div><script src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>{"autosize":true,"symbol":"COMEX:GC1!","interval":"60","timezone":"Europe/Helsinki","theme":"dark","style":"1","locale":"fi","allow_symbol_change":true,"calendar":false,"support_host":"https://www.tradingview.com"}</script></div></div>
+<div class="chart"><div class="tradingview-widget-container" style="height:100%;width:100%"><div class="tradingview-widget-container__widget" style="height:calc(100% - 32px);width:100%"></div><script src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>{"autosize":true,"symbol":"OANDA:XAUUSD","interval":"60","timezone":"Europe/Helsinki","theme":"dark","style":"1","locale":"fi","allow_symbol_change":true,"calendar":false,"support_host":"https://www.tradingview.com"}</script></div></div>
 </main>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
