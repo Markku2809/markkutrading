@@ -4,73 +4,74 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AIM Trading</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
-    margin: 0;
-    padding: 0;
-  }
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
 
-  header {
-    background-color: #2d6a4f; /* murrettu vihreä */
-    color: white;
-    padding: 20px;
-    text-align: center;
-    position: relative;
-  }
+    header {
+      background-color: #2d6a4f;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
 
-  .lang-switch {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-  }
+    .lang-switch {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
 
-  .lang-switch a {
-    color: #fff;
-    margin-left: 10px;
-    text-decoration: none;
-    font-weight: bold;
-  }
+    .lang-switch a {
+      color: #fff;
+      margin-left: 10px;
+      text-decoration: none;
+      font-weight: bold;
+    }
 
-  main {
-    padding: 20px;
-    max-width: 800px;
-    margin: auto;
-    background: white;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  }
+    main {
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
 
-  h1 {
-    margin-top: 0;
-  }
+    h1 { margin-top: 0; }
+    .section { margin-bottom: 40px; }
+    .images {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .images img {
+      width: 100%;
+      max-width: 380px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    footer {
+      background-color: #eee;
+      text-align: center;
+      padding: 10px;
+      font-size: 14px;
+      color: #444;
+    }
 
-  .section {
-    margin-bottom: 40px;
-  }
-
-  .images {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .images img {
-    width: 100%;
-    max-width: 380px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  }
-
-  footer {
-    background-color: #eee;
-    text-align: center;
-    padding: 10px;
-    font-size: 14px;
-    color: #444;
-  }
-</style>
+    @keyframes scroll-left {
+      0% {
+        transform: translateX(100%);
+      }
+      100% {
+        transform: translateX(-100%);
+      }
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -83,7 +84,14 @@
     </div>
   </header>
 
-  <!-- TradingView Mini Ticker EN -->
+  <section style="max-width:800px;margin:22px auto;padding:24px;text-align:center;background:linear-gradient(135deg,#153f30,#2d6a4f);color:white;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.18);">
+    <div style="font-size:14px;letter-spacing:.08em;text-transform:uppercase;opacity:.8;">Daily market outlook</div>
+    <h2 style="margin:8px 0 6px;font-size:30px;">Morning Briefing</h2>
+    <p style="margin:0 0 18px;opacity:.9;">See fresh price data, technical structure, sources and one clear conclusion.</p>
+    <a href="morning-analysis.html" style="display:inline-block;background:#33d69f;color:#073126;padding:14px 24px;border-radius:10px;text-decoration:none;font-weight:800;">Open morning analysis</a>
+  </section>
+
+  <!-- TradingView Mini Ticker -->
   <div class="tradingview-widget-container" style="margin-top: -10px; margin-bottom: 20px;">
     <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js">
     {
@@ -97,97 +105,187 @@
       "colorTheme": "light",
       "isTransparent": false,
       "displayMode": "adaptive",
-      "locale": "en"
+      "locale": "fi"
     }
     </script>
   </div>
-  <!-- TradingView Mini Ticker END -->
 
-  <main>
+<!-- 📊 Markun tarkkailulista (liikkuva + linkit + pysähtyy) -->
+<div class="ticker-container">
+  <h3 style="text-align: center;">📊 Markku's watchlist</h3>
+  <div class="ticker-content">
+    <span><a href="https://www.tradingview.com/symbols/NASDAQ-NVDA/" target="_blank"><strong>NVDA</strong></a> $845.00 <span style="color: green;">▲ 1.23%</span></span>
+    <span><a href="https://www.tradingview.com/symbols/NASDAQ-TSLA/" target="_blank"><strong>TSLA</strong></a> $172.30 <span style="color: red;">▼ 0.85%</span></span>
+    <span><a href="https://www.tradingview.com/symbols/TSE-M3/" target="_blank"><strong>M3</strong></a> ¥2,145.50 <span style="color: green;">▲ 0.42%</span></span>
+    <span><a href="https://www.tradingview.com/symbols/NASDAQ-AMD/" target="_blank"><strong>AMD</strong></a> $165.70 <span style="color: green;">▲ 1.11%</span></span>
+    <span><a href="https://www.tradingview.com/symbols/OMXHEX-NESTE/" target="_blank"><strong>NESTE.HE</strong></a> €26.42 <span style="color: red;">▼ 0.20%</span></span>
+  </div>
+</div>
+
+<style>
+.ticker-container {
+  background-color: #f2f2f2;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  overflow: hidden;
+  font-family: sans-serif;
+  white-space: nowrap;
+}
+.ticker-content {
+  display: inline-block;
+  animation: scroll-left 25s linear infinite;
+}
+.ticker-container:hover .ticker-content {
+  animation-play-state: paused;
+}
+.ticker-content span {
+  display: inline-block;
+  margin-right: 40px;
+}
+.ticker-content a {
+  text-decoration: none;
+  color: black;
+}
+</style>
+<!-- 💎 Hyödykebanneri (pyörivä + linkit + pysähtyy) -->
+<div class="ticker-container">
+  <h3 style="text-align: center;">💎 Commodity markets</h3>
+  <div class="ticker-content">
+    <span><a href="https://www.tradingview.com/symbols/OANDA-XAUUSD/" target="_blank"><strong>Gold</strong></a> $2342.50 <span style="color: green;">▲ 0.45%</span></span>
+    <span><a href="https://www.tradingview.com/symbols/OANDA-XCUUSD/" target="_blank"><strong>Copper</strong></a> $4.25 <span style="color: red;">▼ 0.20%</span></span>
+    <span><a href="https://www.tradingview.com/symbols/OANDA-XPDUSD/" target="_blank"><strong>Palladium</strong></a> $1050.30 <span style="color: green;">▲ 1.05%</span></span>
+    <span><a href="https://www.tradingview.com/symbols/OANDA-XPTUSD/" target="_blank"><strong>Platina</strong></a> $968.80 <span style="color: red;">▼ 0.32%</span></span>
+    <span><a href="https://www.tradingview.com/symbols/OANDA-UKOIL/" target="_blank"><strong>Oil (Brent)</strong></a> $89.20 <span style="color: green;">▲ 0.91%</span></span>
+  </div>
+</div>
+
+<style>
+.ticker-container {
+  background-color: #e6f2ff;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  overflow: hidden;
+  font-family: sans-serif;
+  white-space: nowrap;
+}
+.ticker-content {
+  display: inline-block;
+  animation: scroll-left 28s linear infinite;
+}
+.ticker-container:hover .ticker-content {
+  animation-play-state: paused;
+}
+.ticker-content span {
+  display: inline-block;
+  margin-right: 40px;
+}
+.ticker-content a {
+  text-decoration: none;
+  color: black;
+}
+</style>
+<main>
     <div class="section">
       <h2>Welcome</h2>
-      <p>We are a small and agile trading office located in Ventspils, focused on stock and commodity markets. We trade daily in gold, cocoa, stock indices and other global instruments.</p>
+      <p>We are a small and agile trading office in Ventspils, focused on equity and commodity markets. We follow gold, cocoa, equity indices and other global instruments every day.</p>
     </div>
 
     <div class="section">
-      <h2>Our Method</h2>
-      <p>We use technical analysis such as RSI, moving averages, volume interpretation and news tracking – combined with experience and intuition. This page is working tool for my self.</p>
+      <h2>Our approach</h2>
+      <p>We combine technical analysis—such as RSI, moving averages, volume interpretation and news monitoring—with experience and intuition. This website is my personal trading workspace.</p>
     </div>
 
     <div class="section">
-      <h2>Photos & Atmosphere</h2>
+      <h2>Office atmosphere</h2>
       <div class="images">
-        <img src="https://i.imgur.com/wGHcCQa.jpeg" alt="Markku trading on Skilling">
+        <img src="https://i.imgur.com/wGHcCQa.jpeg" alt="Markku trading with Skilling">
+        <img src="toimiston-markkinanakyma.png" alt="Office market view and S&P 500 heatmap">
       </div>
     </div>
 
+    <section style="max-width:800px;margin:22px auto 28px;padding:22px 24px;background:linear-gradient(135deg,#3d3215,#79601e);color:#fff;border:1px solid #a98a37;border-radius:15px;box-shadow:0 8px 24px rgba(61,50,21,.22);display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:240px;">
+        <div style="font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#f4d77b;">Important market dates</div>
+        <h2 style="margin:6px 0 5px;font-size:28px;">📅 Commodity calendar</h2>
+        <p style="margin:0;color:#f4ead0;line-height:1.5;">Check important dates for gold, oil, copper and other commodities before trading.</p>
+      </div>
+      <a href="hyodykekalenteri_en.html" style="display:inline-block;background:#f4d77b;color:#342a12;padding:13px 20px;border-radius:10px;text-decoration:none;font-weight:800;white-space:nowrap;">Open calendar →</a>
+    </section>
+
+    <div class="section">
+      <h2>Markets and mining</h2>
+      <p>Gold and Rio Tinto are shown side by side in a compact view. On mobile, the charts stack vertically.</p>
+      <style>
+        .compact-chart-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+        .compact-chart-card { min-width:0; background:#f8faf9; border:1px solid #dce6e1; border-radius:12px; padding:12px; }
+        .compact-chart-card h3 { margin:0 0 10px; text-align:center; }
+        @media (max-width:760px) { .compact-chart-grid { grid-template-columns:1fr; } }
+      </style>
+      <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+      <div class="compact-chart-grid">
+        <div class="compact-chart-card">
+          <h3>Gold</h3>
+          <div id="tradingview_markkukulta"></div>
+        </div>
+        <div class="compact-chart-card">
+          <h3>Rio Tinto</h3>
+          <div id="tradingview_riotinto"></div>
+        </div>
+      </div>
+      <script type="text/javascript">
+        new TradingView.widget({"width":"100%","height":360,"symbol":"OANDA:XAUUSD","interval":"60","timezone":"Etc/UTC","theme":"light","style":"1","locale":"en","toolbar_bg":"#f1f3f6","enable_publishing":false,"hide_side_toolbar":true,"allow_symbol_change":true,"container_id":"tradingview_markkukulta"});
+        new TradingView.widget({"width":"100%","height":360,"symbol":"NYSE:RIO","interval":"D","timezone":"Etc/UTC","theme":"light","style":"1","locale":"en","toolbar_bg":"#f1f3f6","enable_publishing":false,"hide_side_toolbar":true,"allow_symbol_change":true,"container_id":"tradingview_riotinto"});
+      </script>
+    </div>
+
+    <div class="section">
+      <h2>Trading notes</h2>
+      <p>Write freely about today's trades, emotions, ideas or anything else. The text is saved automatically in your browser.</p>
+      <textarea id="hoylynpolyn-laatikko" rows="12" cols="100" placeholder="Write your notes here..."></textarea>
+      <br><br>
+    </div>
+
+    <script>
+      const laatikko = document.getElementById("hoylynpolyn-laatikko");
+      laatikko.value = localStorage.getItem("hoylynpolyn_sisalto") || "";
+      laatikko.addEventListener("input", () => {
+        localStorage.setItem("hoylynpolyn_sisalto", laatikko.value);
+      });
+    </script>
+
+    <div class="section">
+      <div style="text-align: center; margin-top: 30px;">
+  <a href="deltamittari_en.html" style="font-size: 20px; background-color: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px;">Open Delta Calculator</a>
+  <a href="iv-calculator.html" style="display:inline-block;font-size:20px;background-color:#6f42c1;color:white;padding:12px 24px;margin:10px;text-decoration:none;border-radius:8px;font-weight:bold;">Option IV Calculator</a>
+</div>
+      <a href="https://aimtrading.fi/popmalaskuri.html">
+  <button style="background-color: #007bff; color: white; padding: 10px 20px; margin: 10px; border: none; border-radius: 5px; cursor: pointer;">
+    Open POP-MA Calculator
+  </button>
+</a>
+      <h2>Trading journal</h2>
+      <p>📘 <a href="paivakirja.html">Open trading journal</a> – track daily options and insights!</p>
+ </div>    
     <div class="section">
       <h2>Contact</h2>
       <p>Email: <strong>markkuinvest@gmail.com</strong><br>
       Location: Ventspils, Latvia</p>
     </div>
+
   </main>
 
   <footer>
-    &copy; 2025 AIM Trading – Cooperation between AI and Markku in the markets
+    &copy; 2025 AIM Trading – AI and Markku working together in the markets
+    <footer style="font-size: 0.9em; color: #666; text-align: center; margin-top: 40px;">
+  AIM Trading is a personal-use support tool. 
+  The content is general information and not investment advice. 
+  We do not manage other people's funds or provide asset management services.
+</footer>
   </footer>
 
-  <!-- TradingView Gold -->
-  <div class="tradingview-widget-container">
-    <div id="tradingview_gold_en"></div>
-    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-    <script type="text/javascript">
-      new TradingView.widget({
-        "width": 800,
-        "height": 500,
-        "symbol": "OANDA:XAUUSD",
-        "interval": "60",
-        "timezone": "Etc/UTC",
-        "theme": "light",
-        "style": "1",
-        "locale": "en",
-        "toolbar_bg": "#f1f3f6",
-        "enable_publishing": false,
-        "hide_side_toolbar": false,
-        "allow_symbol_change": true,
-        "container_id": "tradingview_gold_en"
-      });
-    </script>
-  </div>
-
-  <!-- TradingView S&P 500 -->
-  <div class="tradingview-widget-container">
-    <div id="tradingview_sp500_en"></div>
-    <script type="text/javascript">
-      new TradingView.widget({
-        "width": 800,
-        "height": 500,
-        "symbol": "OANDA:SPX500USD",
-        "interval": "60",
-        "timezone": "Etc/UTC",
-        "theme": "light",
-        "style": "1",
-        "locale": "en",
-        "toolbar_bg": "#f1f3f6",
-        "enable_publishing": false,
-        "hide_side_toolbar": false,
-        "allow_symbol_change": true,
-        "container_id": "tradingview_sp500_en"
-      });
-    </script>
-  
-</div>
-  "hide_side_toolbar": false,
-        "allow_symbol_change": true,
-        "container_id": "tradingview_sp500_en"
-      });
-    </script>
-    <div style="width: 100%; text-align: center; margin-top: 20px; clear: both;">
-  <a href="deltamittari_en.html" style="display: inline-block; margin: 0 12px;">📊 Delta Calculator</a>
-  <a href="hyodykekalenteri_en.html" style="display: inline-block; margin: 0 12px;">🗓️ Commodity Calendar</a>
-</div>
-</body>
-</html>
-  </div>
 </body>
 </html>
