@@ -1,49 +1,68 @@
 {
-  "decision": "put-setup nyt",
-  "summary": "Kullan viitefutuurin hinta- ja momenttirakenne tukevat laskusuuntaa. Varmista toteutustaso omasta instrumentista.",
-  "generated_at": "2026-07-26T13:02:51.014581+03:00",
-  "instrument": "GC=F (Yahoo Finance -viitefutuuri; ei varmennettu IG-instrumentti)",
-  "price_time": "2026-07-24T04:00:00+00:00",
-  "support": 3962.5,
-  "resistance": 4199.7,
-  "rsi14": 44.0,
+  "decision": "epäselvä – ei treidiä",
+  "day_direction": "epäselvä",
+  "confidence": "heikko",
+  "summary": "US500-markkina on kiinni tai viimeisin hintadata on liian vanhaa aamun suuntapäätökseen.",
+  "reasons": [
+    "Hinta 7447.50 suhteessa EMA20-tasoon 7455.29 ja EMA50-tasoon 7460.12.",
+    "30 minuutin RSI(14) on 48.9.",
+    "Viimeisimmän 30 minuutin muutoksen suunta on +0.00 %.",
+    "Hintadatan ikä on 37.2 tuntia.",
+    "Vanha hinta ei oikeuta call- tai put-setupia."
+  ],
+  "rise_scenario": "Noususkenaario vahvistuu, jos US500-futuuri pysyy EMA20:n (7455.29) yläpuolella ja murtaa lasketun vastuksen 7496.50.",
+  "fall_scenario": "Laskuskenaario vahvistuu, jos hinta jää EMA20:n (7455.29) alle ja rikkoo lasketun tuen 7431.50.",
+  "invalidation": "Odota tuoretta hintaa ja selkeää rakennetta.",
+  "generated_at": "2026-07-26T13:13:27.639376+03:00",
+  "instrument": "ES=F (US500/S&P 500 E-mini -viitefutuuri; ei varmennettu IG-instrumentti)",
+  "price_time": "2026-07-24T20:59:59+00:00",
+  "support": 7431.5,
+  "resistance": 7496.5,
+  "ema20": 7455.29,
+  "ema50": 7460.12,
+  "rsi14": 48.9,
   "markets": [
     {
-      "name": "Kulta",
-      "price": 4070.8,
-      "change_pct": 0.6
+      "name": "US500-futuuri",
+      "price": 7447.5,
+      "change_pct": 0.0
     },
     {
-      "name": "S&P 500",
+      "name": "S&P 500 käteinen",
       "price": 7411.98,
-      "change_pct": 0.05
+      "change_pct": -0.01
     },
     {
       "name": "Nasdaq 100",
       "price": 28128.34,
-      "change_pct": -1.15
+      "change_pct": -0.03
+    },
+    {
+      "name": "Kulta",
+      "price": 4070.8,
+      "change_pct": 0.0
     },
     {
       "name": "DAX",
       "price": 25099.0,
-      "change_pct": 1.36
+      "change_pct": 0.03
     }
   ],
   "sources": [
     {
-      "title": "Yahoo Finance chart API – GC=F",
-      "url": "https://finance.yahoo.com/quote/GC=F/",
-      "published_at": "2026-07-24T04:00:00+00:00"
+      "title": "Yahoo Finance – S&P 500 E-mini Futures (ES=F)",
+      "url": "https://finance.yahoo.com/quote/ES=F/",
+      "published_at": "2026-07-24T20:59:59+00:00"
     },
     {
-      "title": "TradingView – Gold Futures",
-      "url": "https://www.tradingview.com/symbols/COMEX-GC1!/",
+      "title": "TradingView – OANDA US500 graafi",
+      "url": "https://www.tradingview.com/symbols/OANDA-SPX500USD/",
       "published_at": "reaaliaikainen graafilähde"
     }
   ],
-  "ig_note": "IG-instrumenttia ei ole varmennettu. Älä käytä viitetasoja sellaisenaan toimeksiantoon.",
+  "ig_note": "IG:n US500-instrumenttia ei ole varmennettu. Älä käytä viitetasoja sellaisenaan toimeksiantoon.",
   "errors": [
-    "Uutiset: HTTP Error 429: Too Many Requests"
+    "Uutiset: Expecting value: line 1 column 1 (char 0)"
   ],
   "disclaimer": "Ei sijoitusneuvontaa. Ei tuotto- tai riskittömyystakuuta. Kauppaa ei suoriteta käyttäjän puolesta."
 }
