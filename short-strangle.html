@@ -1054,6 +1054,21 @@
         return canvas;
       }
 
+      function makeOcrHeaderCanvas(canvas) {
+        const sourceHeight = Math.min(canvas.height, Math.max(320, Math.round(canvas.height * .34)));
+        const scale = Math.min(3, 4800 / canvas.width);
+        const headerCanvas = document.createElement("canvas");
+        headerCanvas.width = Math.round(canvas.width * scale);
+        headerCanvas.height = Math.round(sourceHeight * scale);
+        const context = headerCanvas.getContext("2d", { willReadFrequently: true });
+        context.drawImage(
+          canvas,
+          0, 0, canvas.width, sourceHeight,
+          0, 0, headerCanvas.width, headerCanvas.height
+        );
+        return headerCanvas;
+      }
+
       function flattenWords(data) {
         if (Array.isArray(data.words) && data.words.length) return data.words;
         const words = [];
@@ -1087,17 +1102,54 @@
         return sided.sort((a, b) => Math.abs(wordCenter(a).x - strikeX) - Math.abs(wordCenter(b).x - strikeX))[0];
       }
 
+      function normalizeOcrDigits(value) {
+        return String(value || "")
+          .toUpperCase()
+          .replace(/O/g, "0")
+          .replace(/[IL]/g, "1")
+          .replace(/G/g, "6")
+          .replace(/S/g, "5")
+          .replace(/B/g, "8");
+      }
+
+      function thirdFriday(year, month) {
+        const date = new Date(year, month - 1, 1, 12);
+        const firstFriday = 1 + ((5 - date.getDay() + 7) % 7);
+        return new Date(year, month - 1, firstFriday + 14, 12);
+      }
+
       function parseExpiryFromText(text) {
         const months = {
           jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
           jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12
         };
-        const matches = [...text.matchAll(/\b(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{2,4})\b/gi)];
-        if (!matches.length) return "";
-        const match = matches[matches.length - 1];
-        const yearNumber = Number(match[3]);
-        const year = yearNumber < 100 ? 2000 + yearNumber : yearNumber;
-        return `${year}-${String(months[match[2].toLowerCase()]).padStart(2, "0")}-${String(Number(match[1])).padStart(2, "0")}`;
+        const exactMatches = [...text.matchAll(/\b(\d{1,2})\s*(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s*['’]?\s*([0-9OILGSB]{2,4})\b/gi)];
+        if (exactMatches.length) {
+          const match = exactMatches[exactMatches.length - 1];
+          const yearNumber = Number(normalizeOcrDigits(match[3]));
+          const day = Number(match[1]);
+          const year = yearNumber < 100 ? 2000 + yearNumber : yearNumber;
+          const month = months[match[2].toLowerCase()];
+          if (day >= 1 && day <= 31 && year >= 2000 && year <= 2100) {
+            return {
+              value: `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
+              estimated: false
+            };
+          }
+        }
+
+        const monthMatches = [...text.matchAll(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s*['’]?\s*([0-9OILGSB]{2,4})\b/gi)];
+        if (/MONTHLY/i.test(text) && monthMatches.length) {
+          const match = monthMatches[0];
+          const yearNumber = Number(normalizeOcrDigits(match[2]));
+          const year = yearNumber < 100 ? 2000 + yearNumber : yearNumber;
+          const month = months[match[1].toLowerCase()];
+          if (year >= 2000 && year <= 2100) {
+            return { value: isoDate(thirdFriday(year, month)), estimated: true };
+          }
+        }
+
+        return { value: "", estimated: false };
       }
 
       function parseUnderlyingFromText(text) {
@@ -1109,6 +1161,165 @@
           .replace(/[+\-−]?\d+(?:[.,]\d+)?\s*%/g, "")
           .replace(/\s{2,}/g, " ")
           .trim();
+      }
+
+      function parseMaturityFromText(text) {
+        const lines = text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+        const headingIndex = lines.findIndex((line) => /\bCALLS?\b.*\bPUTS?\b|\bCALLS?\b|\bPUTS?\b/i.test(line));
+        const searchLines = headingIndex > 0 ? lines.slice(Math.max(0, headingIndex - 5), headingIndex + 1) : lines.slice(0, 12);
+        const candidates = searchLines.flatMap((line) => {
+          const exact = line.match(/^\s*([0-9O][0-9O.,]{2,})\s*$/i);
+          if (!exact) return [];
+          const value = numberValue(exact[1]);
+          return Number.isFinite(value) && value >= 100 ? [value] : [];
+        });
+        return candidates.length ? candidates[candidates.length - 1] : NaN;
+      }
+
+      function numericValuesFromLine(line) {
+        return (line.match(/[0-9O]+(?:[.,][0-9O]+)?/gi) || [])
+          .map((token) => numberValue(token))
+          .filter(Number.isFinite);
+      }
+
+      function plausibleIv(value) {
+        return Number.isFinite(value) && value > 0 && value < 300;
+      }
+
+      function parseRowsFromText(text, maturityPrice) {
+        const rows = [];
+        text.split(/\r?\n/).forEach((line) => {
+          const values = numericValuesFromLine(line);
+          if (values.length < 5) return;
+
+          const strikeCandidates = values
+            .map((value, index) => ({ value, index }))
+            .filter(({ value, index }) =>
+              value >= 100 &&
+              index >= 2 &&
+              values.length - index >= 3 &&
+              (!Number.isFinite(maturityPrice) || (value > maturityPrice * .55 && value < maturityPrice * 1.45))
+            );
+          if (!strikeCandidates.length) return;
+
+          const strikeCandidate = [...strikeCandidates].sort((a, b) => {
+            if (Number.isFinite(maturityPrice)) {
+              return Math.abs(a.value - maturityPrice) - Math.abs(b.value - maturityPrice);
+            }
+            return b.value - a.value;
+          })[0];
+
+          const left = values.slice(0, strikeCandidate.index);
+          const right = values.slice(strikeCandidate.index + 1);
+          if (left.length < 2 || right.length < 2) return;
+
+          const row = blankRow();
+          row.strike = String(strikeCandidate.value);
+          row.callSell = String(left[left.length - 2]);
+          row.callBuy = String(left[left.length - 1]);
+          row.putSell = String(right[0]);
+          row.putBuy = String(right[1]);
+
+          const callIv = left.slice(0, -2).find(plausibleIv);
+          const putIv = [...right.slice(2)].reverse().find(plausibleIv);
+          if (Number.isFinite(callIv)) row.callIv = String(callIv);
+          if (Number.isFinite(putIv)) row.putIv = String(putIv);
+          rows.push(row);
+        });
+        return rows;
+      }
+
+      function mergeParsedRows(primaryRows, fallbackRows) {
+        const merged = [];
+        [...primaryRows, ...fallbackRows].forEach((row) => {
+          const strike = numberValue(row.strike);
+          if (!Number.isFinite(strike)) return;
+          const existing = merged.find((candidate) => numberValue(candidate.strike) === strike);
+          if (!existing) {
+            merged.push({ ...blankRow(), ...row });
+            return;
+          }
+          Object.keys(existing).forEach((key) => {
+            if (!existing[key] && row[key]) existing[key] = row[key];
+          });
+        });
+        return merged.sort((a, b) => numberValue(a.strike) - numberValue(b.strike));
+      }
+
+      function scaledValueNear(value, reference, predicate) {
+        if (!Number.isFinite(value)) return NaN;
+        const candidates = [value, value / 10, value / 100, value / 1000, value / 10000, value / 100000]
+          .filter(predicate);
+        if (!candidates.length) return NaN;
+        if (!Number.isFinite(reference)) return candidates[0];
+        return candidates.sort((a, b) => Math.abs(a - reference) - Math.abs(b - reference))[0];
+      }
+
+      function completeParsedRows(rows) {
+        let estimatedIvCount = 0;
+        let repairedQuoteCount = 0;
+        const completed = rows.map((source) => {
+          const row = { ...blankRow(), ...source };
+          let callIv = numberValue(row.callIv);
+          let putIv = numberValue(row.putIv);
+
+          if (!plausibleIv(callIv) && plausibleIv(putIv)) {
+            callIv = scaledValueNear(callIv, putIv, plausibleIv);
+          }
+          if (!plausibleIv(putIv) && plausibleIv(callIv)) {
+            putIv = scaledValueNear(putIv, callIv, plausibleIv);
+          }
+          if (!plausibleIv(callIv) && plausibleIv(putIv)) {
+            callIv = putIv;
+            estimatedIvCount += 1;
+          }
+          if (!plausibleIv(putIv) && plausibleIv(callIv)) {
+            putIv = callIv;
+            estimatedIvCount += 1;
+          }
+
+          [["callSell", "callBuy"], ["putSell", "putBuy"]].forEach(([sellKey, buyKey]) => {
+            let sell = numberValue(row[sellKey]);
+            let buy = numberValue(row[buyKey]);
+            if (Number.isFinite(sell) && Number.isFinite(buy) && buy < sell) {
+              const repaired = scaledValueNear(sell, buy, (candidate) => candidate >= 0 && candidate <= buy);
+              if (Number.isFinite(repaired) && repaired !== sell) {
+                sell = repaired;
+                repairedQuoteCount += 1;
+              }
+            }
+            if (Number.isFinite(sell) && Number.isFinite(buy) && (buy < sell || buy > sell * 3 + 20)) {
+              const repaired = scaledValueNear(buy, sell, (candidate) => candidate >= sell && candidate <= sell * 1.5 + 20);
+              if (Number.isFinite(repaired) && repaired !== buy) {
+                buy = repaired;
+                repairedQuoteCount += 1;
+              }
+            }
+            if (Number.isFinite(sell)) row[sellKey] = String(sell);
+            if (Number.isFinite(buy)) row[buyKey] = String(buy);
+          });
+
+          row.callIv = plausibleIv(callIv) ? String(callIv) : "";
+          row.putIv = plausibleIv(putIv) ? String(putIv) : "";
+          return row;
+        });
+
+        completed.forEach((row) => {
+          ["callIv", "putIv"].forEach((key) => {
+            if (plausibleIv(numberValue(row[key]))) return;
+            const strike = numberValue(row.strike);
+            const nearest = completed
+              .filter((candidate) => plausibleIv(numberValue(candidate[key])))
+              .sort((a, b) =>
+                Math.abs(numberValue(a.strike) - strike) - Math.abs(numberValue(b.strike) - strike)
+              )[0];
+            if (!nearest) return;
+            row[key] = nearest[key];
+            estimatedIvCount += 1;
+          });
+        });
+
+        return { rows: completed, estimatedIvCount, repairedQuoteCount };
       }
 
       function parseRowsFromOcr(words, canvasWidth, canvasHeight) {
@@ -1230,25 +1441,54 @@
             }
           });
           const result = await worker.recognize(canvas, {}, { text: true, blocks: true });
+          let headerText = "";
+          try {
+            await worker.setParameters({
+              tessedit_pageseg_mode: "6",
+              preserve_interword_spaces: "1"
+            });
+            const headerResult = await worker.recognize(makeOcrHeaderCanvas(canvas), {}, { text: true });
+            headerText = headerResult.data.text || "";
+          } catch (headerError) {
+            console.info("Otsikon tarkennettu luku ei onnistunut.", headerError);
+          }
           await worker.terminate();
 
           const text = result.data.text || "";
+          const combinedText = `${text}\n${headerText}`.trim();
           const words = flattenWords(result.data);
-          const parsed = parseRowsFromOcr(words, canvas.width, canvas.height);
-          ocrText.textContent = text || "Tekstiä ei tunnistettu.";
+          const coordinateParsed = parseRowsFromOcr(words, canvas.width, canvas.height);
+          const maturityPrice = Number.isFinite(coordinateParsed.maturityPrice)
+            ? coordinateParsed.maturityPrice
+            : parseMaturityFromText(combinedText);
+          const fallbackRows = parseRowsFromText(text, maturityPrice);
+          const completed = completeParsedRows(mergeParsedRows(coordinateParsed.rows, fallbackRows));
+          ocrText.textContent = combinedText || "Tekstiä ei tunnistettu.";
 
-          const underlying = parseUnderlyingFromText(text);
-          const expiry = parseExpiryFromText(text);
-          if (underlying) fields.underlying.value = underlying;
-          if (expiry) fields.expiry.value = expiry;
-          if (Number.isFinite(parsed.maturityPrice)) fields.maturityPrice.value = parsed.maturityPrice;
-          if (parsed.rows.length) chainRows = parsed.rows;
+          const underlying = parseUnderlyingFromText(combinedText);
+          const expiry = parseExpiryFromText(combinedText);
+          fields.underlying.value = underlying;
+          fields.expiry.value = expiry.value;
+          fields.maturityPrice.value = Number.isFinite(maturityPrice) ? maturityPrice : "";
+          chainRows = completed.rows;
           renderTable();
           saveState();
           ocrProgress.style.width = "100%";
 
-          if (parsed.rows.length >= 2) {
-            ocrStatus.textContent = `Valmis: ${parsed.rows.length} strike-riviä tunnistettiin. Tarkista nyt hinnat taulukosta.`;
+          const notices = [];
+          if (expiry.estimated) notices.push("Eräpäivä arvioitiin kuukausisopimuksen kolmanneksi perjantaiksi – tarkista päivämäärä.");
+          if (completed.estimatedIvCount) notices.push(`${completed.estimatedIvCount} puuttuvaa IV-arvoa täydennettiin saman striken toiselta puolelta.`);
+          if (completed.repairedQuoteCount) notices.push(`${completed.repairedQuoteCount} OCR:n desimaalivirhettä korjattiin.`);
+
+          const config = readConfig();
+          const validatedRows = validatedOptions();
+          const validation = validate(config, validatedRows);
+          if (completed.rows.length >= 2 && !validation.messages.length) {
+            ocrStatus.textContent = `Valmis: ${completed.rows.length} strike-riviä täytettiin ja avauspaikat laskettiin. ${notices.join(" ")}`.trim();
+            document.getElementById("analyzeButton").click();
+          } else if (completed.rows.length >= 2) {
+            ocrStatus.textContent = `Valmis: ${completed.rows.length} strike-riviä täytettiin. ${notices.join(" ")} Tarkista vain korostetut puutteet.`.trim();
+            showValidation(validation.messages);
             document.getElementById("verifyTitle").scrollIntoView({ behavior: "smooth", block: "start" });
           } else {
             ocrStatus.textContent = "Kuva luettiin, mutta rivejä löytyi liian vähän. Rajaa kuva koko optionketjuun tai täytä taulukko käsin.";
@@ -1411,18 +1651,22 @@
           const dte = Math.round((new Date(`${config.expiry}T12:00:00`) - new Date()) / 86400000);
           if (dte <= 0) messages.push("Eräpäivän pitää olla tulevaisuudessa.");
         }
-        const puts = rows.filter((row) =>
+        const quotedPuts = rows.filter((row) =>
           row.strike < config.forward &&
-          [row.putSell, row.putBuy, row.putIv].every(Number.isFinite) &&
+          [row.putSell, row.putBuy].every(Number.isFinite) &&
           row.putBuy >= row.putSell
         );
-        const calls = rows.filter((row) =>
+        const quotedCalls = rows.filter((row) =>
           row.strike > config.forward &&
-          [row.callSell, row.callBuy, row.callIv].every(Number.isFinite) &&
+          [row.callSell, row.callBuy].every(Number.isFinite) &&
           row.callBuy >= row.callSell
         );
-        if (!puts.length) messages.push("Tarvitaan vähintään yksi täysin täytetty OTM put -rivi.");
-        if (!calls.length) messages.push("Tarvitaan vähintään yksi täysin täytetty OTM call -rivi.");
+        const puts = quotedPuts.filter((row) => Number.isFinite(row.putIv));
+        const calls = quotedCalls.filter((row) => Number.isFinite(row.callIv));
+        if (!quotedPuts.length) messages.push("Kuvasta ei löytynyt OTM put -rivin SELL- ja BUY-hintoja.");
+        else if (!puts.length) messages.push("OTM put -riveiltä puuttuu IV, jota tarvitaan delta-arvioon.");
+        if (!quotedCalls.length) messages.push("Kuvasta ei löytynyt OTM call -rivin SELL- ja BUY-hintoja.");
+        else if (!calls.length) messages.push("OTM call -riveiltä puuttuu IV, jota tarvitaan delta-arvioon.");
         return { messages, puts, calls };
       }
 
