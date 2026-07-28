@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="AIM Tradingin short strangle -avauspaikkojen analysointityökalu.">
   <title>Short Strangle -analyysi | AIM Trading</title>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" defer></script>
+  <script src="vendor/tesseract/tesseract.min.js" defer></script>
   <style>
     :root {
       --green-950: #073126;
@@ -1161,6 +1161,9 @@
         try {
           const canvas = await makeOcrCanvas(selectedFile);
           const worker = await Tesseract.createWorker("eng", 1, {
+            workerPath: "vendor/tesseract/worker.min.js",
+            corePath: "vendor/tesseract/core",
+            langPath: "vendor/tesseract/lang",
             logger(message) {
               if (message.status === "recognizing text") {
                 const progress = Math.round((message.progress || 0) * 92) + 6;
