@@ -654,16 +654,17 @@
           <div class="upload-grid">
             <div>
               <input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp" hidden>
-              <label class="drop-zone" id="dropZone" for="imageInput">
+              <label class="drop-zone" id="dropZone" for="imageInput" tabindex="0">
                 <div class="drop-copy" id="dropCopy">
                   <div class="drop-icon">▣</div>
-                  <strong>Valitse kuva tai pudota se tähän</strong>
-                  <span>PNG, JPG tai WEBP · rajaa mukaan koko optionketju</span>
+                  <strong>Valitse, pudota tai liitä kuva</strong>
+                  <span>PNG, JPG tai WEBP · liitä leikepöydältä Ctrl + V</span>
                 </div>
                 <img id="imagePreview" alt="Ladatun optioketjun esikatselu">
               </label>
               <div class="image-actions">
                 <button class="primary-button" id="readImageButton" type="button" disabled>Lue hinnat kuvasta</button>
+                <button class="ghost-button" id="pasteImageButton" type="button">Liitä kuva (Ctrl+V)</button>
                 <button class="ghost-button" id="chooseAnotherButton" type="button" hidden>Vaihda kuva</button>
               </div>
               <div class="progress" aria-hidden="true"><span id="ocrProgress"></span></div>
@@ -672,12 +673,13 @@
             <aside class="tip-card">
               <h3>Näin saat parhaan tuloksen</h3>
               <ul>
+                <li>Ota rajaus näppäimillä Win + Shift + S ja liitä se tähän painamalla Ctrl + V.</li>
                 <li>Ota kuva yhdestä eräpäivästä ja niin monesta strike-rivistä kuin mahdollista.</li>
                 <li>Pidä CALLS-, STRIKE- ja PUTS-otsikot näkyvissä.</li>
                 <li>Varmista, etteivät hinnat ole katkenneet kuvan reunoista.</li>
                 <li>Tarkista aina kuvanluvusta syntynyt taulukko ennen laskentaa.</li>
               </ul>
-              <small>Kuvaa tai sen sisältöä ei tallenneta AIM Tradingin palvelimelle. Tekstintunnistus toimii selaimessasi ulkoisen ohjelmakirjaston avulla.</small>
+              <small>Kuvaa tai sen sisältöä ei tallenneta AIM Tradingin palvelimelle. Tekstintunnistus toimii selaimessasi paikallisen ohjelmakirjaston avulla.</small>
             </aside>
           </div>
           <details id="ocrDetails">
@@ -815,6 +817,7 @@
       const dropCopy = document.getElementById("dropCopy");
       const dropZone = document.getElementById("dropZone");
       const readImageButton = document.getElementById("readImageButton");
+      const pasteImageButton = document.getElementById("pasteImageButton");
       const chooseAnotherButton = document.getElementById("chooseAnotherButton");
       const ocrStatus = document.getElementById("ocrStatus");
       const ocrProgress = document.getElementById("ocrProgress");
@@ -952,11 +955,58 @@
         ocrProgress.style.width = "0";
       }
 
+      function clipboardImageFile(blob) {
+        const extensions = {
+          "image/jpeg": "jpg",
+          "image/webp": "webp"
+        };
+        const extension = extensions[blob.type] || "png";
+        const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+        return new File([blob], `optioketju-${timestamp}.${extension}`, {
+          type: blob.type || "image/png"
+        });
+      }
+
+      function showClipboardImage(blob) {
+        showSelectedImage(clipboardImageFile(blob));
+        ocrStatus.textContent = "Leikepöydän kuva liitetty. Aloita painamalla “Lue hinnat kuvasta”.";
+      }
+
       imageInput.addEventListener("change", () => {
         if (imageInput.files && imageInput.files[0]) showSelectedImage(imageInput.files[0]);
       });
 
       chooseAnotherButton.addEventListener("click", () => imageInput.click());
+
+      document.addEventListener("paste", (event) => {
+        const items = Array.from(event.clipboardData?.items || []);
+        const imageItem = items.find((item) => item.type.startsWith("image/"));
+        if (!imageItem) return;
+        const file = imageItem.getAsFile();
+        if (!file) return;
+        event.preventDefault();
+        showClipboardImage(file);
+      });
+
+      pasteImageButton.addEventListener("click", async () => {
+        if (navigator.clipboard?.read) {
+          try {
+            const items = await navigator.clipboard.read();
+            for (const item of items) {
+              const imageType = item.types.find((type) => type.startsWith("image/"));
+              if (!imageType) continue;
+              showClipboardImage(await item.getType(imageType));
+              return;
+            }
+            ocrStatus.textContent = "Leikepöydältä ei löytynyt kuvaa. Ota rajaus ja paina Ctrl + V.";
+            return;
+          } catch (error) {
+            console.info("Leikepöydän suora luku ei ollut käytettävissä.", error);
+          }
+        }
+        dropZone.focus();
+        ocrStatus.textContent = "Paina nyt Ctrl + V liittääksesi kuvan.";
+      });
 
       ["dragenter", "dragover"].forEach((eventName) => {
         dropZone.addEventListener(eventName, (event) => {
@@ -973,8 +1023,13 @@
       });
 
       dropZone.addEventListener("drop", (event) => {
-        const file = event.dataTransfer.files && event.dataTransfer.files[0];
-        if (file && file.type.startsWith("image/")) showSelectedImage(file);
+        const files = Array.from(event.dataTransfer?.files || []);
+        const file = files.find((candidate) => candidate.type.startsWith("image/"));
+        if (file) {
+          showSelectedImage(file);
+          return;
+        }
+        ocrStatus.textContent = "Pudotuksesta ei löytynyt kuvatiedostoa. Jos kuva on leikepöydällä, paina Ctrl + V.";
       });
 
       async function makeOcrCanvas(file) {
