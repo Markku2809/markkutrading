@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AIM Tradingin short strangle -avauspaikkojen analysointityökalu.">
+  <title>Short Strangle -analyysi | AIM Trading</title>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" defer></script>
+  <style>
+    :root {
+      --green-950: #073126;
+      --green-900: #123f31;
+      --green-800: #1d513e;
+      --green-700: #2d6a4f;
+      --green-500: #27a97c;
+      --mint: #33d69f;
+      --mint-soft: #e7f8f1;
+      --gold: #f4d77b;
+      --ink: #14221d;
+      --muted: #60736b;
+      --line: #d7e4de;
+      --surface: #ffffff;
+      --surface-alt: #f4f8f6;
+      --danger: #a93c3c;
+      --danger-soft: #fff0f0;
+      --warning: #8a5b12;
+      --warning-soft: #fff7e6;
+      --shadow: 0 12px 32px rgba(18, 63, 49, 0.11);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 4%, rgba(51, 214, 159, .12), transparent 28rem),
+        linear-gradient(180deg, #eef6f2 0, #f8faf9 38rem, #f3f6f4 100%);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+    }
+
+    button, input, select, textarea { font: inherit; }
+    button, .button-link { touch-action: manipulation; }
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .site-header {
+      color: white;
+      background: linear-gradient(135deg, var(--green-950), var(--green-700));
+      border-bottom: 4px solid var(--mint);
+    }
+
+    .header-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: auto;
+      padding: 20px 0 24px;
+    }
+
+    .top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: white;
+      text-decoration: none;
+      font-weight: 700;
+      border: 1px solid rgba(255,255,255,.28);
+      border-radius: 999px;
+      padding: 8px 13px;
+    }
+
+    .privacy-badge {
+      color: #dff8ef;
+      font-size: 14px;
+      text-align: right;
+    }
+
+    .hero {
+      max-width: 780px;
+      padding: 34px 0 10px;
+    }
+
+    .eyebrow {
+      color: var(--mint);
+      text-transform: uppercase;
+      letter-spacing: .11em;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    h1 {
+      margin: 7px 0 10px;
+      font-size: clamp(34px, 6vw, 58px);
+      letter-spacing: -.035em;
+      line-height: 1.03;
+    }
+
+    .hero p {
+      margin: 0;
+      color: #e0eee8;
+      font-size: clamp(17px, 2.4vw, 21px);
+      max-width: 720px;
+    }
+
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 28px auto 52px;
+    }
+
+    .workflow {
+      display: grid;
+      gap: 22px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 22px 24px 12px;
+    }
+
+    .step-number {
+      flex: 0 0 34px;
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      color: white;
+      background: var(--green-700);
+      font-weight: 800;
+    }
+
+    .panel h2 {
+      margin: 1px 0 3px;
+      font-size: clamp(22px, 3vw, 28px);
+      letter-spacing: -.02em;
+    }
+
+    .panel-head p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .panel-body { padding: 12px 24px 26px; }
+
+    .upload-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(280px, .9fr);
+      gap: 20px;
+    }
+
+    .drop-zone {
+      min-height: 270px;
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: hidden;
+      border: 2px dashed #91b5a6;
+      border-radius: 15px;
+      background: var(--surface-alt);
+      cursor: pointer;
+      transition: .18s ease;
+    }
+
+    .drop-zone:hover,
+    .drop-zone.dragging {
+      border-color: var(--green-500);
+      background: var(--mint-soft);
+      transform: translateY(-1px);
+    }
+
+    .drop-copy {
+      padding: 26px;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .drop-icon {
+      width: 56px;
+      height: 56px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 11px;
+      border-radius: 16px;
+      color: var(--green-900);
+      background: #d9f4e9;
+      font-size: 28px;
+    }
+
+    .drop-copy strong { display: block; font-size: 19px; }
+    .drop-copy span { color: var(--muted); font-size: 14px; }
+
+    #imagePreview {
+      display: none;
+      width: 100%;
+      max-height: 430px;
+      object-fit: contain;
+      background: #eef2f0;
+    }
+
+    .image-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-top: 13px;
+    }
+
+    .primary-button,
+    .secondary-button,
+    .ghost-button,
+    .danger-button {
+      appearance: none;
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 16px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: .16s ease;
+    }
+
+    .primary-button {
+      color: var(--green-950);
+      background: var(--mint);
+      box-shadow: 0 5px 14px rgba(39, 169, 124, .22);
+    }
+
+    .primary-button:hover { filter: brightness(.96); transform: translateY(-1px); }
+    .primary-button:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+    .secondary-button {
+      color: white;
+      background: var(--green-700);
+    }
+
+    .ghost-button {
+      color: var(--green-800);
+      background: #edf5f1;
+      border: 1px solid #cce0d7;
+    }
+
+    .danger-button {
+      color: var(--danger);
+      background: var(--danger-soft);
+      border: 1px solid #f0caca;
+    }
+
+    .status {
+      min-height: 24px;
+      margin: 9px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .progress {
+      width: 100%;
+      height: 8px;
+      margin-top: 10px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e4ede9;
+    }
+
+    .progress > span {
+      display: block;
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--green-500), var(--mint));
+      transition: width .22s ease;
+    }
+
+    .tip-card {
+      padding: 18px;
+      border-radius: 14px;
+      background: #f0f7f4;
+      border: 1px solid #d4e7df;
+    }
+
+    .tip-card h3 { margin: 0 0 9px; font-size: 18px; }
+    .tip-card ul { margin: 0; padding-left: 20px; }
+    .tip-card li + li { margin-top: 7px; }
+    .tip-card small { display: block; margin-top: 14px; color: var(--muted); }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    label.field {
+      display: grid;
+      gap: 6px;
+      color: #354d43;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .field input,
+    .field select,
+    .paste-area {
+      width: 100%;
+      color: var(--ink);
+      background: white;
+      border: 1px solid #bdd1c8;
+      border-radius: 9px;
+      padding: 10px 11px;
+      outline: none;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .paste-area:focus {
+      border-color: var(--green-500);
+      box-shadow: 0 0 0 3px rgba(39, 169, 124, .14);
+    }
+
+    .table-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin: 10px 0;
+    }
+
+    .table-toolbar p { margin: 0; color: var(--muted); font-size: 14px; }
+    .toolbar-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      color: #365449;
+      background: #edf5f1;
+      font-size: 13px;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    th, td { padding: 9px 8px; border-bottom: 1px solid #e2ebe7; }
+    tr:last-child td { border-bottom: 0; }
+    td { text-align: right; }
+
+    td input {
+      width: 92px;
+      border: 1px solid #cadbd4;
+      border-radius: 7px;
+      padding: 7px 8px;
+      text-align: right;
+    }
+
+    th:first-child,
+    td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      background: white;
+    }
+
+    th:first-child { background: #edf5f1; }
+
+    .remove-row {
+      padding: 6px 9px;
+      color: var(--danger);
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .paste-box {
+      display: none;
+      margin-top: 14px;
+      padding: 15px;
+      background: var(--surface-alt);
+      border-radius: 12px;
+    }
+
+    .paste-box.open { display: block; }
+    .paste-area { min-height: 110px; resize: vertical; font-family: Consolas, monospace; }
+    .paste-help { margin: 6px 0 10px; color: var(--muted); font-size: 13px; }
+
+    .validation {
+      display: none;
+      margin-top: 14px;
+      padding: 12px 14px;
+      color: var(--danger);
+      background: var(--danger-soft);
+      border: 1px solid #efc5c5;
+      border-radius: 10px;
+    }
+
+    .analysis-action {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    .analysis-action p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    #resultsPanel { display: none; }
+    #resultsPanel.visible { display: block; }
+
+    .summary-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .summary-item {
+      padding: 13px;
+      border-radius: 11px;
+      background: var(--surface-alt);
+      border: 1px solid #deebe5;
+    }
+
+    .summary-item span { display: block; color: var(--muted); font-size: 12px; }
+    .summary-item strong { display: block; margin-top: 2px; font-size: 17px; }
+
+    .notice {
+      margin: 12px 0 18px;
+      padding: 13px 15px;
+      border-radius: 11px;
+      border: 1px solid #edd9aa;
+      background: var(--warning-soft);
+      color: #6e4a10;
+    }
+
+    .notice.danger {
+      color: #7d2929;
+      border-color: #eec3c3;
+      background: var(--danger-soft);
+    }
+
+    .candidate-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 15px;
+    }
+
+    .candidate {
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: white;
+      overflow: hidden;
+    }
+
+    .candidate.recommended {
+      border-color: var(--green-500);
+      box-shadow: 0 0 0 3px rgba(39, 169, 124, .11);
+    }
+
+    .candidate-head {
+      padding: 17px;
+      color: white;
+      background: linear-gradient(135deg, var(--green-900), var(--green-700));
+    }
+
+    .candidate.conservative .candidate-head { background: linear-gradient(135deg, #244a68, #39789f); }
+    .candidate.aggressive .candidate-head { background: linear-gradient(135deg, #6f4719, #ad7426); }
+    .candidate-head small { opacity: .8; text-transform: uppercase; letter-spacing: .08em; }
+    .candidate-head h3 { margin: 4px 0 0; font-size: 23px; }
+
+    .legs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 14px;
+      background: #f7faf8;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .leg {
+      padding: 10px;
+      border-radius: 9px;
+      background: white;
+      border: 1px solid #dce8e2;
+    }
+
+    .leg span { display: block; color: var(--muted); font-size: 12px; }
+    .leg strong { display: block; margin: 2px 0; font-size: 20px; }
+    .leg small { color: #49685b; }
+
+    .metric-list {
+      display: grid;
+      gap: 0;
+      padding: 6px 14px 12px;
+    }
+
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 9px 0;
+      border-bottom: 1px solid #e7efeb;
+      font-size: 14px;
+    }
+
+    .metric:last-child { border-bottom: 0; }
+    .metric span { color: var(--muted); }
+    .metric strong { text-align: right; }
+
+    .risk-tag {
+      display: inline-block;
+      margin: 0 14px 14px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .risk-tag.ok { color: #246448; background: #e0f5eb; }
+    .risk-tag.warn { color: #7b5010; background: #fff0cc; }
+
+    .scenario-heading {
+      margin: 23px 0 10px;
+      font-size: 21px;
+    }
+
+    .scenario-table th,
+    .scenario-table td { text-align: right; }
+    .scenario-table th:first-child,
+    .scenario-table td:first-child { text-align: left; }
+    .positive { color: #16734f; font-weight: 800; }
+    .negative { color: var(--danger); font-weight: 800; }
+
+    .management {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .management article {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface-alt);
+    }
+
+    .management h4 { margin: 0 0 5px; }
+    .management p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    details {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    details pre {
+      max-height: 220px;
+      overflow: auto;
+      white-space: pre-wrap;
+      color: #213b30;
+      background: #eff5f2;
+      padding: 12px;
+      border-radius: 9px;
+    }
+
+    footer {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto 30px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+    }
+
+    @media (max-width: 920px) {
+      .upload-grid,
+      .candidate-grid { grid-template-columns: 1fr; }
+      .field-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .management { grid-template-columns: 1fr; }
+      .candidate { max-width: 680px; }
+    }
+
+    @media (max-width: 620px) {
+      .header-inner, main, footer { width: min(100% - 20px, 1180px); }
+      .privacy-badge { display: none; }
+      .panel-head { padding: 18px 16px 8px; }
+      .panel-body { padding: 10px 16px 20px; }
+      .field-grid, .summary-strip { grid-template-columns: 1fr 1fr; }
+      .table-toolbar, .analysis-action { align-items: stretch; flex-direction: column; }
+      .analysis-action button { width: 100%; }
+      h1 { font-size: 38px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="top-row">
+        <a class="back-link" href="index_fi.html" aria-label="Takaisin AIM Tradingin etusivulle">← Etusivulle</a>
+        <div class="privacy-badge">Kuva käsitellään tässä selaimessa</div>
+      </div>
+      <div class="hero">
+        <div class="eyebrow">AIM Trading · optiotyökalu</div>
+        <h1>Short Strangle -avauspaikat</h1>
+        <p>Lataa kuvakaappaus optioketjusta, tarkista luetut hinnat ja vertaa kolmea avausvaihtoehtoa samoilla kriteereillä joka kerta.</p>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="workflow">
+      <section class="panel" aria-labelledby="uploadTitle">
+        <div class="panel-head">
+          <div class="step-number">1</div>
+          <div>
+            <h2 id="uploadTitle">Lataa optioketjun kuva</h2>
+            <p>Paras kuva näyttää tuotteen, eräpäivän, maturiteettihinnan, striket sekä SELL-, BUY- ja IV-sarakkeet.</p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="upload-grid">
+            <div>
+              <input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+              <label class="drop-zone" id="dropZone" for="imageInput">
+                <div class="drop-copy" id="dropCopy">
+                  <div class="drop-icon">▣</div>
+                  <strong>Valitse kuva tai pudota se tähän</strong>
+                  <span>PNG, JPG tai WEBP · rajaa mukaan koko optionketju</span>
+                </div>
+                <img id="imagePreview" alt="Ladatun optioketjun esikatselu">
+              </label>
+              <div class="image-actions">
+                <button class="primary-button" id="readImageButton" type="button" disabled>Lue hinnat kuvasta</button>
+                <button class="ghost-button" id="chooseAnotherButton" type="button" hidden>Vaihda kuva</button>
+              </div>
+              <div class="progress" aria-hidden="true"><span id="ocrProgress"></span></div>
+              <p class="status" id="ocrStatus" aria-live="polite">Kuvaa ei ole vielä valittu.</p>
+            </div>
+            <aside class="tip-card">
+              <h3>Näin saat parhaan tuloksen</h3>
+              <ul>
+                <li>Ota kuva yhdestä eräpäivästä ja niin monesta strike-rivistä kuin mahdollista.</li>
+                <li>Pidä CALLS-, STRIKE- ja PUTS-otsikot näkyvissä.</li>
+                <li>Varmista, etteivät hinnat ole katkenneet kuvan reunoista.</li>
+                <li>Tarkista aina kuvanluvusta syntynyt taulukko ennen laskentaa.</li>
+              </ul>
+              <small>Kuvaa tai sen sisältöä ei tallenneta AIM Tradingin palvelimelle. Tekstintunnistus toimii selaimessasi ulkoisen ohjelmakirjaston avulla.</small>
+            </aside>
+          </div>
+          <details id="ocrDetails">
+            <summary>Näytä kuvanluvusta tunnistettu teksti</summary>
+            <pre id="ocrText">Ei tunnistettua tekstiä.</pre>
+          </details>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="verifyTitle">
+        <div class="panel-head">
+          <div class="step-number">2</div>
+          <div>
+            <h2 id="verifyTitle">Tarkista tiedot</h2>
+            <p>Kuvantunnistus voi tehdä virheitä. Kaikki kentät ja taulukon hinnat ovat korjattavissa.</p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="field-grid">
+            <label class="field">Tuote
+              <input id="underlying" type="text" placeholder="esim. EU Stocks 50">
+            </label>
+            <label class="field">Eräpäivä
+              <input id="expiry" type="date">
+            </label>
+            <label class="field">Maturiteettihinta
+              <input id="maturityPrice" type="number" min="0" step="0.01" placeholder="6293.0">
+            </label>
+            <label class="field">Pistearvo
+              <input id="pointValue" type="number" min="0.01" step="0.01" value="1">
+            </label>
+            <label class="field">Riskibudjetti
+              <input id="riskBudget" type="number" min="0" step="1" value="300">
+            </label>
+            <label class="field">Valuutta
+              <select id="currency">
+                <option value="EUR">EUR €</option>
+                <option value="USD">USD $</option>
+                <option value="GBP">GBP £</option>
+              </select>
+            </label>
+            <label class="field">Koko
+              <input id="positionSize" type="number" min="0.01" step="0.01" value="1">
+            </label>
+            <label class="field">Marginaali (valinnainen)
+              <input id="margin" type="number" min="0" step="1" placeholder="esim. 2500">
+            </label>
+          </div>
+
+          <div class="table-toolbar">
+            <p id="rowCount">0 strike-riviä. Tarvitaan vähintään yksi OTM put ja yksi OTM call.</p>
+            <div class="toolbar-buttons">
+              <button class="ghost-button" id="sampleButton" type="button">Kokeile esimerkillä</button>
+              <button class="ghost-button" id="pasteToggleButton" type="button">Liitä taulukko</button>
+              <button class="ghost-button" id="addRowButton" type="button">+ Lisää rivi</button>
+              <button class="danger-button" id="clearButton" type="button">Tyhjennä</button>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table aria-label="Optioketjun hinnat">
+              <thead>
+                <tr>
+                  <th>Strike</th>
+                  <th>Call IV %</th>
+                  <th>Call SELL</th>
+                  <th>Call BUY</th>
+                  <th>Put SELL</th>
+                  <th>Put BUY</th>
+                  <th>Put IV %</th>
+                  <th><span class="visually-hidden">Poista</span></th>
+                </tr>
+              </thead>
+              <tbody id="chainBody"></tbody>
+            </table>
+          </div>
+
+          <div class="paste-box" id="pasteBox">
+            <label class="field" for="pasteArea">Liitä rivejä</label>
+            <p class="paste-help">Yksi strike per rivi: strike, call IV, call SELL, call BUY, put SELL, put BUY, put IV. Erottele tabulaattorilla, puolipisteellä tai välilyönneillä.</p>
+            <textarea class="paste-area" id="pasteArea" placeholder="6050  19.74  280.4  283.4  37.8  40.8  19.74"></textarea>
+            <button class="secondary-button" id="importPasteButton" type="button">Tuo rivit taulukkoon</button>
+          </div>
+
+          <div class="validation" id="validationBox" role="alert"></div>
+
+          <div class="analysis-action">
+            <p>Delta arvioidaan IV:n, maturiteettihinnan ja jäljellä olevan ajan perusteella. Tulokset ovat päätöksenteon tukea, eivät toimeksianto.</p>
+            <button class="primary-button" id="analyzeButton" type="button">Laske avauspaikat →</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="resultsPanel" aria-labelledby="resultsTitle">
+        <div class="panel-head">
+          <div class="step-number">3</div>
+          <div>
+            <h2 id="resultsTitle">Avauspaikkojen vertailu</h2>
+            <p id="resultLead"></p>
+          </div>
+        </div>
+        <div class="panel-body" id="resultsBody"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    AIM Trading on henkilökohtaiseen käyttöön tarkoitettu aputyökalu. Short strangle sisältää rajoittamattoman tappioriskin ylöspäin ja suuren tappioriskin alaspäin. Sisältö ei ole sijoitusneuvontaa.
+  </footer>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const targets = [
+        { key: "conservative", label: "Konservatiivinen", delta: 0.125 },
+        { key: "balanced", label: "Tasapainoinen", delta: 0.175 },
+        { key: "aggressive", label: "Aggressiivinen", delta: 0.225 }
+      ];
+
+      const fields = {
+        underlying: document.getElementById("underlying"),
+        expiry: document.getElementById("expiry"),
+        maturityPrice: document.getElementById("maturityPrice"),
+        pointValue: document.getElementById("pointValue"),
+        riskBudget: document.getElementById("riskBudget"),
+        currency: document.getElementById("currency"),
+        positionSize: document.getElementById("positionSize"),
+        margin: document.getElementById("margin")
+      };
+
+      const chainBody = document.getElementById("chainBody");
+      const imageInput = document.getElementById("imageInput");
+      const imagePreview = document.getElementById("imagePreview");
+      const dropCopy = document.getElementById("dropCopy");
+      const dropZone = document.getElementById("dropZone");
+      const readImageButton = document.getElementById("readImageButton");
+      const chooseAnotherButton = document.getElementById("chooseAnotherButton");
+      const ocrStatus = document.getElementById("ocrStatus");
+      const ocrProgress = document.getElementById("ocrProgress");
+      const ocrText = document.getElementById("ocrText");
+      const rowCount = document.getElementById("rowCount");
+      const validationBox = document.getElementById("validationBox");
+      const resultsPanel = document.getElementById("resultsPanel");
+      const resultsBody = document.getElementById("resultsBody");
+      const resultLead = document.getElementById("resultLead");
+
+      let selectedFile = null;
+      let previewUrl = null;
+      let chainRows = [];
+
+      function blankRow() {
+        return { strike: "", callIv: "", callSell: "", callBuy: "", putSell: "", putBuy: "", putIv: "" };
+      }
+
+      function formatNumber(value, maximumFractionDigits = 2) {
+        if (!Number.isFinite(value)) return "–";
+        return new Intl.NumberFormat("fi-FI", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits
+        }).format(value);
+      }
+
+      function money(value, currency) {
+        if (!Number.isFinite(value)) return "–";
+        return new Intl.NumberFormat("fi-FI", {
+          style: "currency",
+          currency,
+          maximumFractionDigits: 2
+        }).format(value);
+      }
+
+      function isoDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+
+      function fiDate(value) {
+        if (!value) return "–";
+        return new Intl.DateTimeFormat("fi-FI").format(new Date(`${value}T12:00:00`));
+      }
+
+      function numberValue(value) {
+        if (typeof value === "number") return Number.isFinite(value) ? value : NaN;
+        if (typeof value !== "string") return NaN;
+        const cleaned = value
+          .trim()
+          .replace(/\s/g, "")
+          .replace(/[−–—]/g, "-")
+          .replace(/,/g, ".")
+          .replace(/[Oo](?=\d)|(?<=\d)[Oo]/g, "0")
+          .replace(/[^0-9.\-]/g, "");
+        if (!/^-?\d+(?:\.\d+)?$/.test(cleaned)) return NaN;
+        return Number(cleaned);
+      }
+
+      function renderTable() {
+        chainBody.innerHTML = "";
+        chainRows
+          .sort((a, b) => (numberValue(a.strike) || 0) - (numberValue(b.strike) || 0))
+          .forEach((row, index) => {
+            const tr = document.createElement("tr");
+            const keys = ["strike", "callIv", "callSell", "callBuy", "putSell", "putBuy", "putIv"];
+            keys.forEach((key) => {
+              const td = document.createElement("td");
+              const input = document.createElement("input");
+              input.type = "number";
+              input.step = "0.01";
+              input.inputMode = "decimal";
+              input.value = row[key];
+              input.setAttribute("aria-label", `${key}, rivi ${index + 1}`);
+              input.addEventListener("input", () => {
+                chainRows[index][key] = input.value;
+                saveState();
+              });
+              td.appendChild(input);
+              tr.appendChild(td);
+            });
+            const removeCell = document.createElement("td");
+            const removeButton = document.createElement("button");
+            removeButton.type = "button";
+            removeButton.className = "remove-row";
+            removeButton.textContent = "×";
+            removeButton.setAttribute("aria-label", `Poista strike-rivi ${index + 1}`);
+            removeButton.addEventListener("click", () => {
+              chainRows.splice(index, 1);
+              renderTable();
+              saveState();
+            });
+            removeCell.appendChild(removeButton);
+            tr.appendChild(removeCell);
+            chainBody.appendChild(tr);
+          });
+        rowCount.textContent = `${chainRows.length} strike-riviä. Tarvitaan vähintään yksi OTM put ja yksi OTM call.`;
+      }
+
+      function saveState() {
+        const payload = {
+          fields: Object.fromEntries(Object.entries(fields).map(([key, element]) => [key, element.value])),
+          chainRows
+        };
+        localStorage.setItem("aim-short-strangle-v1", JSON.stringify(payload));
+      }
+
+      function restoreState() {
+        try {
+          const saved = JSON.parse(localStorage.getItem("aim-short-strangle-v1") || "null");
+          if (!saved) return;
+          Object.entries(saved.fields || {}).forEach(([key, value]) => {
+            if (fields[key]) fields[key].value = value;
+          });
+          if (Array.isArray(saved.chainRows)) chainRows = saved.chainRows;
+        } catch (error) {
+          console.warn("Tallennettujen tietojen palautus epäonnistui.", error);
+        }
+      }
+
+      Object.values(fields).forEach((field) => field.addEventListener("input", saveState));
+
+      function showSelectedImage(file) {
+        selectedFile = file;
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        previewUrl = URL.createObjectURL(file);
+        imagePreview.src = previewUrl;
+        imagePreview.style.display = "block";
+        dropCopy.style.display = "none";
+        readImageButton.disabled = false;
+        chooseAnotherButton.hidden = false;
+        ocrStatus.textContent = `${file.name} valittu. Aloita painamalla “Lue hinnat kuvasta”.`;
+        ocrProgress.style.width = "0";
+      }
+
+      imageInput.addEventListener("change", () => {
+        if (imageInput.files && imageInput.files[0]) showSelectedImage(imageInput.files[0]);
+      });
+
+      chooseAnotherButton.addEventListener("click", () => imageInput.click());
+
+      ["dragenter", "dragover"].forEach((eventName) => {
+        dropZone.addEventListener(eventName, (event) => {
+          event.preventDefault();
+          dropZone.classList.add("dragging");
+        });
+      });
+
+      ["dragleave", "drop"].forEach((eventName) => {
+        dropZone.addEventListener(eventName, (event) => {
+          event.preventDefault();
+          dropZone.classList.remove("dragging");
+        });
+      });
+
+      dropZone.addEventListener("drop", (event) => {
+        const file = event.dataTransfer.files && event.dataTransfer.files[0];
+        if (file && file.type.startsWith("image/")) showSelectedImage(file);
+      });
+
+      async function makeOcrCanvas(file) {
+        const image = await createImageBitmap(file);
+        const maximumWidth = 2400;
+        const scale = Math.min(1, maximumWidth / image.width);
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(image.width * scale);
+        canvas.height = Math.round(image.height * scale);
+        const context = canvas.getContext("2d", { willReadFrequently: true });
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+        for (let index = 0; index < pixels.data.length; index += 4) {
+          const gray = .299 * pixels.data[index] + .587 * pixels.data[index + 1] + .114 * pixels.data[index + 2];
+          const enhanced = Math.max(0, Math.min(255, (gray - 128) * 1.35 + 128));
+          pixels.data[index] = enhanced;
+          pixels.data[index + 1] = enhanced;
+          pixels.data[index + 2] = enhanced;
+        }
+        context.putImageData(pixels, 0, 0);
+        image.close();
+        return canvas;
+      }
+
+      function flattenWords(data) {
+        if (Array.isArray(data.words) && data.words.length) return data.words;
+        const words = [];
+        (data.blocks || []).forEach((block) => {
+          (block.paragraphs || []).forEach((paragraph) => {
+            (paragraph.lines || []).forEach((line) => {
+              (line.words || []).forEach((word) => words.push(word));
+            });
+          });
+        });
+        return words;
+      }
+
+      function wordCenter(word) {
+        const box = word.bbox || {};
+        return {
+          x: ((box.x0 || 0) + (box.x1 || 0)) / 2,
+          y: ((box.y0 || 0) + (box.y1 || 0)) / 2,
+          height: (box.y1 || 0) - (box.y0 || 0)
+        };
+      }
+
+      function normalizedWord(word) {
+        return String(word.text || "").toUpperCase().replace(/[^A-Z]/g, "");
+      }
+
+      function closestHeader(words, name, side, strikeX) {
+        const matching = words.filter((word) => normalizedWord(word) === name);
+        const sided = matching.filter((word) => side === "left" ? wordCenter(word).x < strikeX : wordCenter(word).x > strikeX);
+        if (!sided.length) return null;
+        return sided.sort((a, b) => Math.abs(wordCenter(a).x - strikeX) - Math.abs(wordCenter(b).x - strikeX))[0];
+      }
+
+      function parseExpiryFromText(text) {
+        const months = {
+          jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
+          jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12
+        };
+        const matches = [...text.matchAll(/\b(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{2,4})\b/gi)];
+        if (!matches.length) return "";
+        const match = matches[matches.length - 1];
+        const yearNumber = Number(match[3]);
+        const year = yearNumber < 100 ? 2000 + yearNumber : yearNumber;
+        return `${year}-${String(months[match[2].toLowerCase()]).padStart(2, "0")}-${String(Number(match[1])).padStart(2, "0")}`;
+      }
+
+      function parseUnderlyingFromText(text) {
+        const lines = text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+        const candidate = lines.find((line) => /(MONTHLY|OPTIONS|STOCKS|US\s*500|GERMANY\s*40|FTSE|WALL\s*STREET)/i.test(line));
+        if (!candidate) return "";
+        return candidate
+          .replace(/\bOPTIONS\b/ig, "")
+          .replace(/[+\-−]?\d+(?:[.,]\d+)?\s*%/g, "")
+          .replace(/\s{2,}/g, " ")
+          .trim();
+      }
+
+      function parseRowsFromOcr(words, canvasWidth, canvasHeight) {
+        const strikeWord = words.find((word) => normalizedWord(word) === "STRIKE");
+        if (!strikeWord) return { rows: [], maturityPrice: NaN };
+        const strikeCenter = wordCenter(strikeWord);
+        const headerY = strikeCenter.y;
+        const headerMap = {
+          callIv: closestHeader(words, "IV", "left", strikeCenter.x),
+          callSell: closestHeader(words, "SELL", "left", strikeCenter.x),
+          callBuy: closestHeader(words, "BUY", "left", strikeCenter.x),
+          strike: strikeWord,
+          putSell: closestHeader(words, "SELL", "right", strikeCenter.x),
+          putBuy: closestHeader(words, "BUY", "right", strikeCenter.x),
+          putIv: closestHeader(words, "IV", "right", strikeCenter.x)
+        };
+
+        const fallbackX = {
+          callIv: canvasWidth * .09,
+          callSell: canvasWidth * .25,
+          callBuy: canvasWidth * .38,
+          strike: canvasWidth * .51,
+          putSell: canvasWidth * .65,
+          putBuy: canvasWidth * .78,
+          putIv: canvasWidth * .91
+        };
+        const columnX = Object.fromEntries(Object.entries(headerMap).map(([key, word]) => [
+          key,
+          word ? wordCenter(word).x : fallbackX[key]
+        ]));
+
+        const numericWords = words
+          .map((word) => ({ word, value: numberValue(word.text), ...wordCenter(word) }))
+          .filter((item) => Number.isFinite(item.value) && item.y > headerY + Math.max(6, canvasHeight * .004));
+
+        const groups = [];
+        const tolerance = Math.max(9, canvasHeight * .007);
+        numericWords.sort((a, b) => a.y - b.y).forEach((item) => {
+          let group = groups.find((candidate) => Math.abs(candidate.y - item.y) <= tolerance);
+          if (!group) {
+            group = { y: item.y, items: [] };
+            groups.push(group);
+          }
+          group.items.push(item);
+          group.y = group.items.reduce((sum, entry) => sum + entry.y, 0) / group.items.length;
+        });
+
+        const keys = Object.keys(columnX);
+        const rows = groups.map((group) => {
+          const row = blankRow();
+          const best = {};
+          group.items.forEach((item) => {
+            const key = keys.reduce((currentBest, candidate) =>
+              Math.abs(item.x - columnX[candidate]) < Math.abs(item.x - columnX[currentBest]) ? candidate : currentBest
+            , keys[0]);
+            const distance = Math.abs(item.x - columnX[key]);
+            if (!best[key] || distance < best[key].distance) best[key] = { value: item.value, distance };
+          });
+          keys.forEach((key) => {
+            if (best[key] && best[key].distance < canvasWidth * .085) row[key] = String(best[key].value);
+          });
+          return row;
+        }).filter((row) => {
+          const strike = numberValue(row.strike);
+          const quoteCount = ["callSell", "callBuy", "putSell", "putBuy"].filter((key) => Number.isFinite(numberValue(row[key]))).length;
+          return Number.isFinite(strike) && strike >= 100 && quoteCount >= 2;
+        });
+
+        const uniqueRows = [];
+        rows.forEach((row) => {
+          const strike = numberValue(row.strike);
+          const existing = uniqueRows.find((candidate) => numberValue(candidate.strike) === strike);
+          if (!existing) uniqueRows.push(row);
+          else Object.keys(row).forEach((key) => {
+            if (!existing[key] && row[key]) existing[key] = row[key];
+          });
+        });
+
+        const priceCandidates = words
+          .map((word) => ({ value: numberValue(word.text), ...wordCenter(word) }))
+          .filter((item) =>
+            Number.isFinite(item.value) &&
+            item.value >= 100 &&
+            item.y < headerY &&
+            Math.abs(item.x - strikeCenter.x) < canvasWidth * .18
+          )
+          .sort((a, b) => b.height - a.height);
+
+        return {
+          rows: uniqueRows.sort((a, b) => numberValue(a.strike) - numberValue(b.strike)),
+          maturityPrice: priceCandidates.length ? priceCandidates[0].value : NaN
+        };
+      }
+
+      readImageButton.addEventListener("click", async () => {
+        if (!selectedFile) return;
+        if (!window.Tesseract) {
+          ocrStatus.textContent = "Kuvanlukijaa ei saatu ladattua. Tarkista verkkoyhteys ja yritä uudelleen.";
+          return;
+        }
+        readImageButton.disabled = true;
+        ocrStatus.textContent = "Valmistellaan kuvaa…";
+        ocrProgress.style.width = "4%";
+
+        try {
+          const canvas = await makeOcrCanvas(selectedFile);
+          const worker = await Tesseract.createWorker("eng", 1, {
+            logger(message) {
+              if (message.status === "recognizing text") {
+                const progress = Math.round((message.progress || 0) * 92) + 6;
+                ocrProgress.style.width = `${progress}%`;
+                ocrStatus.textContent = `Luetaan hintoja… ${Math.round((message.progress || 0) * 100)} %`;
+              } else if (message.status) {
+                ocrStatus.textContent = "Kuvanlukija valmistautuu…";
+              }
+            }
+          });
+          const result = await worker.recognize(canvas, {}, { text: true, blocks: true });
+          await worker.terminate();
+
+          const text = result.data.text || "";
+          const words = flattenWords(result.data);
+          const parsed = parseRowsFromOcr(words, canvas.width, canvas.height);
+          ocrText.textContent = text || "Tekstiä ei tunnistettu.";
+
+          const underlying = parseUnderlyingFromText(text);
+          const expiry = parseExpiryFromText(text);
+          if (underlying) fields.underlying.value = underlying;
+          if (expiry) fields.expiry.value = expiry;
+          if (Number.isFinite(parsed.maturityPrice)) fields.maturityPrice.value = parsed.maturityPrice;
+          if (parsed.rows.length) chainRows = parsed.rows;
+          renderTable();
+          saveState();
+          ocrProgress.style.width = "100%";
+
+          if (parsed.rows.length >= 2) {
+            ocrStatus.textContent = `Valmis: ${parsed.rows.length} strike-riviä tunnistettiin. Tarkista nyt hinnat taulukosta.`;
+            document.getElementById("verifyTitle").scrollIntoView({ behavior: "smooth", block: "start" });
+          } else {
+            ocrStatus.textContent = "Kuva luettiin, mutta rivejä löytyi liian vähän. Rajaa kuva koko optionketjuun tai täytä taulukko käsin.";
+            document.getElementById("ocrDetails").open = true;
+          }
+        } catch (error) {
+          console.error(error);
+          ocrStatus.textContent = "Kuvan luku epäonnistui. Voit vaihtaa kuvan tai syöttää hinnat taulukkoon käsin.";
+          ocrProgress.style.width = "0";
+        } finally {
+          readImageButton.disabled = false;
+        }
+      });
+
+      document.getElementById("addRowButton").addEventListener("click", () => {
+        chainRows.push(blankRow());
+        renderTable();
+      });
+
+      document.getElementById("clearButton").addEventListener("click", () => {
+        chainRows = [];
+        Object.values(fields).forEach((field) => field.value = "");
+        fields.pointValue.value = "1";
+        fields.riskBudget.value = "300";
+        fields.currency.value = "EUR";
+        fields.positionSize.value = "1";
+        localStorage.removeItem("aim-short-strangle-v1");
+        renderTable();
+        resultsPanel.classList.remove("visible");
+      });
+
+      document.getElementById("pasteToggleButton").addEventListener("click", () => {
+        document.getElementById("pasteBox").classList.toggle("open");
+      });
+
+      document.getElementById("importPasteButton").addEventListener("click", () => {
+        const text = document.getElementById("pasteArea").value.trim();
+        const imported = text.split(/\r?\n/).map((line) => {
+          const values = line.trim().split(/\t|;|\s{2,}|\s+/).filter(Boolean).map(numberValue);
+          if (values.length < 7 || values.some((value) => !Number.isFinite(value))) return null;
+          return {
+            strike: String(values[0]),
+            callIv: String(values[1]),
+            callSell: String(values[2]),
+            callBuy: String(values[3]),
+            putSell: String(values[4]),
+            putBuy: String(values[5]),
+            putIv: String(values[6])
+          };
+        }).filter(Boolean);
+        if (imported.length) {
+          chainRows = imported;
+          renderTable();
+          saveState();
+          document.getElementById("pasteBox").classList.remove("open");
+        } else {
+          showValidation(["Liitetystä tekstistä ei löytynyt seitsemän numeroarvon rivejä."]);
+        }
+      });
+
+      document.getElementById("sampleButton").addEventListener("click", () => {
+        const today = new Date();
+        const expiry = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 45);
+        fields.underlying.value = "EU Stocks 50 (esimerkki)";
+        fields.expiry.value = isoDate(expiry);
+        fields.maturityPrice.value = "6300";
+        fields.pointValue.value = "1";
+        fields.riskBudget.value = "300";
+        fields.currency.value = "EUR";
+        fields.positionSize.value = "1";
+        chainRows = [
+          { strike:"6000", callIv:"20.2", callSell:"325.0", callBuy:"328.0", putSell:"28.0", putBuy:"31.0", putIv:"20.1" },
+          { strike:"6050", callIv:"19.7", callSell:"280.0", callBuy:"283.0", putSell:"38.0", putBuy:"41.0", putIv:"19.7" },
+          { strike:"6100", callIv:"19.1", callSell:"239.0", callBuy:"242.0", putSell:"47.0", putBuy:"50.0", putIv:"19.0" },
+          { strike:"6150", callIv:"18.4", callSell:"200.0", callBuy:"203.0", putSell:"58.0", putBuy:"61.0", putIv:"18.4" },
+          { strike:"6200", callIv:"17.7", callSell:"164.0", callBuy:"167.0", putSell:"71.0", putBuy:"74.0", putIv:"17.7" },
+          { strike:"6250", callIv:"17.1", callSell:"131.0", callBuy:"134.0", putSell:"88.0", putBuy:"91.0", putIv:"17.0" },
+          { strike:"6300", callIv:"16.4", callSell:"101.0", callBuy:"104.0", putSell:"108.0", putBuy:"111.0", putIv:"16.4" },
+          { strike:"6350", callIv:"15.8", callSell:"75.0", callBuy:"78.0", putSell:"132.0", putBuy:"135.0", putIv:"15.8" },
+          { strike:"6400", callIv:"15.2", callSell:"53.0", callBuy:"56.0", putSell:"160.0", putBuy:"163.0", putIv:"15.2" },
+          { strike:"6450", callIv:"14.7", callSell:"36.0", callBuy:"39.0", putSell:"192.0", putBuy:"195.0", putIv:"14.6" },
+          { strike:"6500", callIv:"14.2", callSell:"23.0", callBuy:"25.5", putSell:"229.0", putBuy:"232.0", putIv:"14.1" },
+          { strike:"6550", callIv:"13.8", callSell:"14.5", callBuy:"17.0", putSell:"270.0", putBuy:"273.0", putIv:"13.7" },
+          { strike:"6600", callIv:"13.4", callSell:"9.0", callBuy:"11.5", putSell:"315.0", putBuy:"318.0", putIv:"13.3" }
+        ];
+        renderTable();
+        saveState();
+      });
+
+      function erf(value) {
+        const sign = value < 0 ? -1 : 1;
+        const x = Math.abs(value);
+        const a1 = 0.254829592;
+        const a2 = -0.284496736;
+        const a3 = 1.421413741;
+        const a4 = -1.453152027;
+        const a5 = 1.061405429;
+        const p = 0.3275911;
+        const t = 1 / (1 + p * x);
+        const y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+        return sign * y;
+      }
+
+      function normalCdf(value) {
+        return .5 * (1 + erf(value / Math.sqrt(2)));
+      }
+
+      function estimateDelta(type, forward, strike, ivPercent, years) {
+        const iv = ivPercent > 1 ? ivPercent / 100 : ivPercent;
+        if (!(forward > 0 && strike > 0 && iv > 0 && years > 0)) return NaN;
+        const sigmaT = iv * Math.sqrt(years);
+        const d1 = (Math.log(forward / strike) + .5 * iv * iv * years) / sigmaT;
+        const callDelta = normalCdf(d1);
+        return type === "call" ? callDelta : callDelta - 1;
+      }
+
+      function expiryPnlPoints(credit, putStrike, callStrike, settlement) {
+        return credit - Math.max(putStrike - settlement, 0) - Math.max(settlement - callStrike, 0);
+      }
+
+      function readConfig() {
+        return {
+          underlying: fields.underlying.value.trim(),
+          expiry: fields.expiry.value,
+          forward: numberValue(fields.maturityPrice.value),
+          pointValue: numberValue(fields.pointValue.value),
+          riskBudget: numberValue(fields.riskBudget.value),
+          currency: fields.currency.value,
+          size: numberValue(fields.positionSize.value),
+          margin: numberValue(fields.margin.value)
+        };
+      }
+
+      function validatedOptions() {
+        return chainRows.map((row) => ({
+          strike: numberValue(row.strike),
+          callIv: numberValue(row.callIv),
+          callSell: numberValue(row.callSell),
+          callBuy: numberValue(row.callBuy),
+          putSell: numberValue(row.putSell),
+          putBuy: numberValue(row.putBuy),
+          putIv: numberValue(row.putIv)
+        }));
+      }
+
+      function showValidation(messages) {
+        validationBox.innerHTML = `<strong>Tarkista nämä:</strong><ul>${messages.map((message) => `<li>${message}</li>`).join("")}</ul>`;
+        validationBox.style.display = "block";
+      }
+
+      function validate(config, rows) {
+        const messages = [];
+        if (!config.underlying) messages.push("Tuotteen nimi puuttuu.");
+        if (!config.expiry) messages.push("Eräpäivä puuttuu.");
+        if (!(config.forward > 0)) messages.push("Maturiteettihinta puuttuu tai ei ole kelvollinen.");
+        if (!(config.pointValue > 0)) messages.push("Pistearvon pitää olla suurempi kuin nolla.");
+        if (!(config.size > 0)) messages.push("Koon pitää olla suurempi kuin nolla.");
+        if (!(config.riskBudget > 0)) messages.push("Riskibudjetin pitää olla suurempi kuin nolla.");
+        if (config.expiry) {
+          const dte = Math.round((new Date(`${config.expiry}T12:00:00`) - new Date()) / 86400000);
+          if (dte <= 0) messages.push("Eräpäivän pitää olla tulevaisuudessa.");
+        }
+        const puts = rows.filter((row) =>
+          row.strike < config.forward &&
+          [row.putSell, row.putBuy, row.putIv].every(Number.isFinite) &&
+          row.putBuy >= row.putSell
+        );
+        const calls = rows.filter((row) =>
+          row.strike > config.forward &&
+          [row.callSell, row.callBuy, row.callIv].every(Number.isFinite) &&
+          row.callBuy >= row.callSell
+        );
+        if (!puts.length) messages.push("Tarvitaan vähintään yksi täysin täytetty OTM put -rivi.");
+        if (!calls.length) messages.push("Tarvitaan vähintään yksi täysin täytetty OTM call -rivi.");
+        return { messages, puts, calls };
+      }
+
+      function buildCandidate(put, call, config, years, scenarioMoves) {
+        const putDelta = estimateDelta("put", config.forward, put.strike, put.putIv, years);
+        const callDelta = estimateDelta("call", config.forward, call.strike, call.callIv, years);
+        const credit = put.putSell + call.callSell;
+        const spread = (put.putBuy - put.putSell) + (call.callBuy - call.callSell);
+        const lowerBreakeven = put.strike - credit;
+        const upperBreakeven = call.strike + credit;
+        const scenarios = scenarioMoves.map((move) => {
+          const settlement = config.forward * (1 + move);
+          const points = expiryPnlPoints(credit, put.strike, call.strike, settlement);
+          return { move, settlement, points, money: points * config.pointValue * config.size };
+        });
+        return {
+          put,
+          call,
+          putDelta,
+          callDelta,
+          credit,
+          spread,
+          spreadPercent: credit > 0 ? spread / credit * 100 : NaN,
+          lowerBreakeven,
+          upperBreakeven,
+          putDistance: (config.forward - put.strike) / config.forward * 100,
+          callDistance: (call.strike - config.forward) / config.forward * 100,
+          lowerDistance: (config.forward - lowerBreakeven) / config.forward * 100,
+          upperDistance: (upperBreakeven - config.forward) / config.forward * 100,
+          maxProfit: credit * config.pointValue * config.size,
+          netDelta: putDelta + callDelta,
+          scenarios
+        };
+      }
+
+      function targetScore(candidate, target) {
+        const deltaPenalty =
+          Math.abs(Math.abs(candidate.putDelta) - target) * 100 +
+          Math.abs(Math.abs(candidate.callDelta) - target) * 100 +
+          Math.abs(candidate.netDelta) * 50;
+        const liquidityPenalty = Math.max((candidate.spreadPercent || 0) - 10, 0) * .25;
+        return deltaPenalty + liquidityPenalty;
+      }
+
+      function inferAtmIv(rows, forward) {
+        const nearest = [...rows].sort((a, b) => Math.abs(a.strike - forward) - Math.abs(b.strike - forward));
+        for (const row of nearest) {
+          const values = [row.callIv, row.putIv].filter(Number.isFinite).map((value) => value > 1 ? value / 100 : value);
+          if (values.length) return values.reduce((sum, value) => sum + value, 0) / values.length;
+        }
+        return NaN;
+      }
+
+      function scenarioColumns(selections, moves, config) {
+        return moves.map((item) => {
+          const cells = selections.map(({ candidate }) => {
+            const points = expiryPnlPoints(candidate.credit, candidate.put.strike, candidate.call.strike, item.settlement);
+            const value = points * config.pointValue * config.size;
+            return `<td class="${value >= 0 ? "positive" : "negative"}">${money(value, config.currency)}</td>`;
+          }).join("");
+          return `<tr><td>${item.label}<br><small>${formatNumber(item.settlement, 1)}</small></td>${cells}</tr>`;
+        }).join("");
+      }
+
+      function renderResults(config, rows, puts, calls) {
+        const now = new Date();
+        const expiryDate = new Date(`${config.expiry}T12:00:00`);
+        const dte = Math.round((expiryDate - now) / 86400000);
+        const years = dte / 365;
+        const allCandidates = [];
+        puts.forEach((put) => calls.forEach((call) => {
+          allCandidates.push(buildCandidate(put, call, config, years, [-.10, -.05, .05, .10]));
+        }));
+
+        const selections = targets.map((target) => ({
+          ...target,
+          candidate: [...allCandidates].sort((a, b) => targetScore(a, target.delta) - targetScore(b, target.delta))[0]
+        }));
+
+        const atmIv = inferAtmIv(rows, config.forward);
+        const expectedMove = Number.isFinite(atmIv) ? config.forward * atmIv * Math.sqrt(years) : NaN;
+        const twentyOneDte = new Date(expiryDate);
+        twentyOneDte.setDate(twentyOneDte.getDate() - 21);
+        const dteStatus = dte >= 35 && dte <= 55
+          ? "35–55 DTE -ikkunassa"
+          : dte < 21
+            ? "alle 21 DTE – korkea gamma"
+            : dte > 90
+              ? "yli 90 DTE – hidas theta"
+              : "35–55 DTE -ikkunan ulkopuolella";
+
+        resultLead.textContent = `${config.underlying}: ${dte} päivää erääntymiseen, maturiteettihinta ${formatNumber(config.forward, 2)}.`;
+
+        const cards = selections.map((selection) => {
+          const c = selection.candidate;
+          const worstScenario = Math.min(...c.scenarios.map((scenario) => scenario.money));
+          const riskExceeded = worstScenario < -config.riskBudget;
+          const spreadWarning = c.spreadPercent > 10;
+          return `
+            <article class="candidate ${selection.key} ${selection.key === "balanced" ? "recommended" : ""}">
+              <div class="candidate-head">
+                <small>Tavoitedelta ${formatNumber(selection.delta, 3)}</small>
+                <h3>${selection.label}${selection.key === "balanced" ? " · keskitaso" : ""}</h3>
+              </div>
+              <div class="legs">
+                <div class="leg">
+                  <span>Myy PUT</span>
+                  <strong>${formatNumber(c.put.strike, 0)}</strong>
+                  <small>SELL ${formatNumber(c.put.putSell)} · Δ ${formatNumber(c.putDelta, 3)}</small>
+                </div>
+                <div class="leg">
+                  <span>Myy CALL</span>
+                  <strong>${formatNumber(c.call.strike, 0)}</strong>
+                  <small>SELL ${formatNumber(c.call.callSell)} · Δ +${formatNumber(c.callDelta, 3)}</small>
+                </div>
+              </div>
+              <div class="metric-list">
+                <div class="metric"><span>Kokonaispreemio</span><strong>${formatNumber(c.credit)} p · ${money(c.maxProfit, config.currency)}</strong></div>
+                <div class="metric"><span>Heti maksettava spread</span><strong>${formatNumber(c.spread)} p · ${formatNumber(c.spreadPercent, 1)} %</strong></div>
+                <div class="metric"><span>Breakevenit</span><strong>${formatNumber(c.lowerBreakeven)} / ${formatNumber(c.upperBreakeven)}</strong></div>
+                <div class="metric"><span>BE-etäisyydet</span><strong>−${formatNumber(c.lowerDistance, 1)} % / +${formatNumber(c.upperDistance, 1)} %</strong></div>
+                <div class="metric"><span>Strike-etäisyydet</span><strong>−${formatNumber(c.putDistance, 1)} % / +${formatNumber(c.callDistance, 1)} %</strong></div>
+                <div class="metric"><span>Nettodelta-arvio</span><strong>${formatNumber(c.netDelta, 3)}</strong></div>
+                <div class="metric"><span>50 % takaisinostotaso</span><strong>${formatNumber(c.credit * .5)} p</strong></div>
+                ${Number.isFinite(config.margin) && config.margin > 0 ? `<div class="metric"><span>Preemio / marginaali</span><strong>${formatNumber(c.maxProfit / config.margin * 100, 1)} %</strong></div>` : ""}
+              </div>
+              <div class="risk-tag ${riskExceeded || spreadWarning ? "warn" : "ok"}">
+                ${riskExceeded ? `±10 % -skenaario ylittää ${money(config.riskBudget, config.currency)} budjetin` : spreadWarning ? "Yhdistetty spread yli 10 % preemiosta" : "Annettu riskibudjetti kestää ±10 % -skenaarion"}
+              </div>
+            </article>
+          `;
+        }).join("");
+
+        const moveRows = [
+          { label: "−10 %", settlement: config.forward * .90 },
+          { label: "−5 %", settlement: config.forward * .95 },
+          ...(Number.isFinite(expectedMove) ? [{ label: "−1 SD", settlement: config.forward - expectedMove }] : []),
+          ...(Number.isFinite(expectedMove) ? [{ label: "+1 SD", settlement: config.forward + expectedMove }] : []),
+          { label: "+5 %", settlement: config.forward * 1.05 },
+          { label: "+10 %", settlement: config.forward * 1.10 }
+        ].sort((a, b) => a.settlement - b.settlement);
+
+        const dataWarning = selections.some(({ candidate }) => candidate.spreadPercent > 10)
+          ? `<div class="notice">Vähintään yhden vaihtoehdon yhdistetty osto–myyntispread ylittää 10 % saadusta preemiosta. Tämä on likviditeettiä koskeva varoitusraja, ei yleispätevä sääntö.</div>`
+          : "";
+
+        resultsBody.innerHTML = `
+          <div class="summary-strip">
+            <div class="summary-item"><span>DTE</span><strong>${dte} päivää</strong></div>
+            <div class="summary-item"><span>Avausikkuna</span><strong>${dteStatus}</strong></div>
+            <div class="summary-item"><span>Arvioitu 1 SD liike</span><strong>${Number.isFinite(expectedMove) ? `±${formatNumber(expectedMove)} p (${formatNumber(expectedMove / config.forward * 100, 1)} %)` : "IV puuttuu"}</strong></div>
+            <div class="summary-item"><span>21 DTE -päivä</span><strong>${fiDate(isoDate(twentyOneDte))}</strong></div>
+          </div>
+          <div class="notice danger"><strong>Riskibudjetti ei ole tappion yläraja.</strong> Suojaamattoman short stranglen nousuriski on rajoittamaton ja laskuriski suuri. ${money(config.riskBudget, config.currency)} toimii tässä vain vertailurajana skenaarioille. Jos haluat aidon enimmäistappion, lisää suojaavat optiot eli muuta rakenne iron condoriksi.</div>
+          ${dataWarning}
+          <div class="candidate-grid">${cards}</div>
+
+          <h3 class="scenario-heading">Tulos eräpäivänä eri päätöstasoilla</h3>
+          <div class="table-wrap">
+            <table class="scenario-table">
+              <thead>
+                <tr>
+                  <th>Päätöstaso</th>
+                  <th>Konservatiivinen</th>
+                  <th>Tasapainoinen</th>
+                  <th>Aggressiivinen</th>
+                </tr>
+              </thead>
+              <tbody>${scenarioColumns(selections, moveRows, config)}</tbody>
+            </table>
+          </div>
+
+          <div class="management">
+            <article>
+              <h4>Voiton kotiutus</h4>
+              <p>50 %:n tavoite tarkoittaa position ostamista takaisin, kun sen hinta on noin puolet saadusta kokonaispreemiosta. Kortit näyttävät tason pisteinä.</p>
+            </article>
+            <article>
+              <h4>Ajanhallinta</h4>
+              <p>Arvioi positio viimeistään ${fiDate(isoDate(twentyOneDte))} eli 21 DTE:n kohdalla. Sen jälkeen gamma-riski yleensä kasvaa nopeasti.</p>
+            </article>
+            <article>
+              <h4>Uudelleenarviointi</h4>
+              <p>Tarkista rakenne, jos kohde-etuus saavuttaa myydyn striken, takaisinostohinta lähestyy kaksinkertaista avauspreemiota tai markkinan volatiliteetti muuttuu voimakkaasti.</p>
+            </article>
+          </div>
+        `;
+
+        resultsPanel.classList.add("visible");
+        resultsPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      document.getElementById("analyzeButton").addEventListener("click", () => {
+        const config = readConfig();
+        const rows = validatedOptions();
+        const { messages, puts, calls } = validate(config, rows);
+        if (messages.length) {
+          showValidation(messages);
+          return;
+        }
+        validationBox.style.display = "none";
+        renderResults(config, rows, puts, calls);
+        saveState();
+      });
+
+      restoreState();
+      renderTable();
+    })();
+  </script>
+</body>
+</html>
