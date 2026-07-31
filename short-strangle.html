@@ -597,6 +597,12 @@
     }
 
     .risk-tag.ok { color: #246448; background: #e0f5eb; }
+    .same-strike { display: block; margin-top: 5px; color: var(--warning); font-size: 11px; font-style: normal; font-weight: 800; }
+    .debug-table-wrap { max-height: 520px; overflow: auto; margin-top: 10px; }
+    .debug-table { min-width: 1180px; font-size: 12px; }
+    .debug-table th, .debug-table td { padding: 6px; }
+    .debug-ok { color: #16734f; font-weight: 800; }
+    .debug-reject { color: var(--danger); font-weight: 700; }
     .risk-tag.warn { color: #7b5010; background: #fff0cc; }
 
     .scenario-heading {
@@ -815,8 +821,14 @@
 
           <div class="validation" id="validationBox" role="alert"></div>
 
+          <details id="debugDetails" open>
+            <summary><strong>Debug-taulukko: kaikki tunnistetut strike-rivit</strong></summary>
+            <p>Taulukko näyttää OCR-datan, arvioidut deltat ja syyn, jos riviä ei voida käyttää OTM-valintaan.</p>
+            <div class="table-wrap debug-table-wrap" id="debugTableWrap"><p>Debug-tiedot päivittyvät, kun painat “Laske avauspaikat”.</p></div>
+          </details>
+
           <div class="analysis-action">
-            <p>Delta arvioidaan IV:n, maturiteettihinnan ja jäljellä olevan ajan perusteella. Tulokset ovat päätöksenteon tukea, eivät toimeksianto.</p>
+            <p>Delta luetaan kuvasta, jos se näkyy; muuten se arvioidaan IV:n, maturiteettihinnan ja jäljellä olevan ajan perusteella. Tulokset ovat päätöksenteon tukea, eivät toimeksianto.</p>
             <button class="primary-button" id="analyzeButton" type="button">Laske avauspaikat →</button>
           </div>
         </div>
@@ -874,6 +886,7 @@
       const rowCount = document.getElementById("rowCount");
       const validationBox = document.getElementById("validationBox");
       const resultsPanel = document.getElementById("resultsPanel");
+      const debugTableWrap = document.getElementById("debugTableWrap");
       const resultsBody = document.getElementById("resultsBody");
       const resultLead = document.getElementById("resultLead");
 
@@ -1637,6 +1650,7 @@ ${combinedText || "Tekstiä ei tunnistettu."}`);
         localStorage.removeItem("aim-short-strangle-v1");
         renderTable();
         resultsPanel.classList.remove("visible");
+        debugTableWrap.innerHTML = "<p>Debug-tiedot päivittyvät, kun painat ‘Laske avauspaikat’.</p>";
       });
 
       document.getElementById("pasteToggleButton").addEventListener("click", () => {
@@ -1755,6 +1769,49 @@ ${combinedText || "Tekstiä ei tunnistettu."}`);
         }));
       }
 
+      function renderDebugTable(config, rows) {
+        const expiryDate = config.expiry ? new Date(`${config.expiry}T12:00:00`) : null;
+        const years = expiryDate ? Math.max((expiryDate - new Date()) / 31536000000, 0) : NaN;
+        const hasForward = Number.isFinite(config.forward) && config.forward > 0;
+        const quote = (value) => Number.isFinite(value) ? formatNumber(value, 3) : "–";
+        const deltaCell = (type, row) => {
+          const iv = type === "put" ? row.putIv : row.callIv;
+          const captured = type === "put" ? row.putDelta : row.callDelta;
+          const estimated = estimateDelta(type, config.forward, row.strike, iv, years);
+          if (Number.isFinite(estimated)) return `${formatNumber(estimated, 4)} (IV-arvio)`;
+          if (Number.isFinite(captured)) return `${formatNumber(captured, 4)} (kuvasta)`;
+          return "–";
+        };
+        const statusFor = (row) => {
+          if (!Number.isFinite(row.strike)) return { ok: false, text: "Hylätty: strike puuttuu tai ei ole numero" };
+          if (!hasForward) return { ok: false, text: "Hylätty: maturiteettihinta puuttuu, OTM-puolta ei voi määrittää" };
+          if (row.strike === config.forward) return { ok: false, text: "Hylätty: ATM-strike, ei OTM put eikä OTM call" };
+          const type = row.strike < config.forward ? "put" : "call";
+          const sell = type === "put" ? row.putSell : row.callSell;
+          const buy = type === "put" ? row.putBuy : row.callBuy;
+          const iv = type === "put" ? row.putIv : row.callIv;
+          const captured = type === "put" ? row.putDelta : row.callDelta;
+          if (!Number.isFinite(sell) || !Number.isFinite(buy)) return { ok: false, text: `Hylätty OTM ${type}: SELL- tai BUY-hinta puuttuu` };
+          if (buy < sell) return { ok: false, text: `Hylätty OTM ${type}: BUY on pienempi kuin SELL` };
+          if (!Number.isFinite(captured) && !Number.isFinite(iv)) return { ok: false, text: `Hylätty OTM ${type}: delta ja IV puuttuvat` };
+          return { ok: true, text: `Hyväksytty OTM ${type}` };
+        };
+        const body = rows.map((row) => {
+          const status = statusFor(row);
+          return `<tr>
+            <td>${quote(row.strike)}</td>
+            <td>${quote(row.callSell)}</td><td>${quote(row.callBuy)}</td>
+            <td>${quote(row.putSell)}</td><td>${quote(row.putBuy)}</td>
+            <td>${quote(row.callIv)}</td><td>${quote(row.putIv)}</td>
+            <td>${deltaCell("call", row)}</td><td>${deltaCell("put", row)}</td>
+            <td class="${status.ok ? "debug-ok" : "debug-reject"}">${status.text}</td>
+          </tr>`;
+        }).join("");
+        debugTableWrap.innerHTML = rows.length ? `<table class="debug-table">
+          <thead><tr><th>Strike</th><th>Call SELL</th><th>Call BUY</th><th>Put SELL</th><th>Put BUY</th><th>Call IV</th><th>Put IV</th><th>Arvioitu call Δ</th><th>Arvioitu put Δ</th><th>Käyttö / hylkäyssyy</th></tr></thead>
+          <tbody>${body}</tbody></table>` : "<p>Ei tunnistettuja strike-rivejä.</p>";
+      }
+
       function showValidation(messages) {
         validationBox.innerHTML = `<strong>Tarkista nämä:</strong><ul>${messages.map((message) => `<li>${message}</li>`).join("")}</ul>`;
         validationBox.style.display = "block";
@@ -1859,10 +1916,7 @@ ${combinedText || "Tekstiä ei tunnistettu."}`);
         const expiryDate = new Date(`${config.expiry}T12:00:00`);
         const dte = Math.round((expiryDate - now) / 86400000);
         const years = dte / 365;
-        const usedPutStrikes = new Set();
-        const usedCallStrikes = new Set();
-
-        function closestUnusedLeg(rowsForSide, type, targetDelta, usedStrikes) {
+        function closestLeg(rowsForSide, type, targetDelta) {
           return rowsForSide
             .map((row) => {
               const iv = type === "put" ? row.putIv : row.callIv;
@@ -1871,39 +1925,38 @@ ${combinedText || "Tekstiä ei tunnistettu."}`);
               const delta = Math.abs(Number.isFinite(capturedDelta) ? capturedDelta : estimatedDelta);
               return { row, delta, difference: Math.abs(delta - targetDelta) };
             })
-            .filter((item) => Number.isFinite(item.delta) && !usedStrikes.has(item.row.strike))
+            .filter((item) => Number.isFinite(item.delta))
             .sort((a, b) => a.difference - b.difference)[0] || null;
         }
 
-        const legSelections = targets.map((target) => {
-          const putMatch = closestUnusedLeg(puts, "put", target.delta, usedPutStrikes);
-          const callMatch = closestUnusedLeg(calls, "call", target.delta, usedCallStrikes);
-          if (putMatch) usedPutStrikes.add(putMatch.row.strike);
-          if (callMatch) usedCallStrikes.add(callMatch.row.strike);
-          return { target, putMatch, callMatch };
-        });
+        const legSelections = targets.map((target) => ({
+          target,
+          putMatch: closestLeg(puts, "put", target.delta),
+          callMatch: closestLeg(calls, "call", target.delta)
+        }));
 
-        const deltaTolerance = 0.055;
-        const insufficientData =
-          puts.length < targets.length ||
-          calls.length < targets.length ||
-          legSelections.some(({ putMatch, callMatch, target }) =>
-            !putMatch ||
-            !callMatch ||
-            Math.abs(putMatch.delta - target.delta) > deltaTolerance ||
-            Math.abs(callMatch.delta - target.delta) > deltaTolerance
-          );
-
-        if (insufficientData) {
-          resultLead.textContent = `Yhdistetystä datasta ei löytynyt tavoitedeltoille kolmea erillistä OTM put- ja OTM call -strikeä.`;
-          resultsBody.innerHTML = `<div class="notice danger"><strong>Option chainin tavoitedelta-alue ei vielä riitä.</strong> Yhdistetyssä datassa on ${puts.length} käyttökelpoista OTM put -riviä ja ${calls.length} OTM call -riviä. Konservatiivinen, tasapainoinen ja aggressiivinen malli tarvitsevat kummaltakin puolelta eri striket, joiden deltat kattavat tavoitealueen 0,125–0,225. Lisää tarvittaessa erillinen kuva puuttuvalta OTM put- tai OTM call -alueelta; kaikkien strikejen ei tarvitse näkyä samassa kuvassa.</div>`;
+        const missingSide = legSelections.some(({ putMatch, callMatch }) => !putMatch || !callMatch);
+        if (missingSide) {
+          resultLead.textContent = "Avauspaikkoja ei voida laskea, koska toiselta OTM-puolelta ei löytynyt yhtään järkevää strikeä.";
+          resultsBody.innerHTML = `<div class="notice danger"><strong>OTM-strike puuttuu.</strong> Yhdistetyssä datassa on ${puts.length} käyttökelpoista OTM put -riviä ja ${calls.length} OTM call -riviä. Laskenta keskeytetään vain tässä tilanteessa.</div>`;
           resultsPanel.classList.add("visible");
           resultsPanel.scrollIntoView({ behavior: "smooth", block: "start" });
           return;
         }
 
+        const putStrikeCounts = new Map();
+        const callStrikeCounts = new Map();
+        legSelections.forEach(({ putMatch, callMatch }) => {
+          putStrikeCounts.set(putMatch.row.strike, (putStrikeCounts.get(putMatch.row.strike) || 0) + 1);
+          callStrikeCounts.set(callMatch.row.strike, (callStrikeCounts.get(callMatch.row.strike) || 0) + 1);
+        });
+
         const selections = legSelections.map(({ target, putMatch, callMatch }) => ({
           ...target,
+          putDifference: putMatch.difference,
+          callDifference: callMatch.difference,
+          putRepeated: putStrikeCounts.get(putMatch.row.strike) > 1,
+          callRepeated: callStrikeCounts.get(callMatch.row.strike) > 1,
           candidate: buildCandidate(putMatch.row, callMatch.row, config, years, [-.10, -.05, .05, .10])
         }));
 
@@ -1936,12 +1989,14 @@ ${combinedText || "Tekstiä ei tunnistettu."}`);
                 <div class="leg">
                   <span>Myy PUT</span>
                   <strong>${formatNumber(c.put.strike, 0)}</strong>
-                  <small>SELL ${formatNumber(c.put.putSell)} · Δ ${formatNumber(c.putDelta, 3)}</small>
+                  <small>SELL ${formatNumber(c.put.putSell)} · arvioitu Δ ${formatNumber(c.putDelta, 3)} · ero tavoitteeseen ${formatNumber(selection.putDifference, 3)}</small>
+                  ${selection.putRepeated ? `<em class="same-strike">sama lähin saatavilla oleva strike</em>` : ""}
                 </div>
                 <div class="leg">
                   <span>Myy CALL</span>
                   <strong>${formatNumber(c.call.strike, 0)}</strong>
-                  <small>SELL ${formatNumber(c.call.callSell)} · Δ +${formatNumber(c.callDelta, 3)}</small>
+                  <small>SELL ${formatNumber(c.call.callSell)} · arvioitu Δ +${formatNumber(c.callDelta, 3)} · ero tavoitteeseen ${formatNumber(selection.callDifference, 3)}</small>
+                  ${selection.callRepeated ? `<em class="same-strike">sama lähin saatavilla oleva strike</em>` : ""}
                 </div>
               </div>
               <div class="metric-list">
@@ -2023,6 +2078,7 @@ ${combinedText || "Tekstiä ei tunnistettu."}`);
       document.getElementById("analyzeButton").addEventListener("click", () => {
         const config = readConfig();
         const rows = validatedOptions();
+        renderDebugTable(config, rows);
         const { messages, puts, calls } = validate(config, rows);
         if (messages.length) {
           showValidation(messages);
