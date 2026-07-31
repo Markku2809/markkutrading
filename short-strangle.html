@@ -682,7 +682,7 @@
       <div class="hero">
         <div class="eyebrow">AIM Trading · optiotyökalu</div>
         <h1>Short Strangle -avauspaikat</h1>
-        <p>Lataa kuvakaappaus optioketjusta, tarkista luetut hinnat ja vertaa kolmea avausvaihtoehtoa samoilla kriteereillä joka kerta.</p>
+        <p>Lataa 1–4 kuvakaappausta samasta optioketjusta, tarkista yhdistetyt hinnat ja vertaa kolmea avausvaihtoehtoa samoilla kriteereillä joka kerta.</p>
       </div>
     </div>
   </header>
@@ -694,7 +694,7 @@
           <div class="step-number">1</div>
           <div>
             <h2 id="uploadTitle">Lataa optioketjun kuvat</h2>
-            <p>Paras kuva näyttää tuotteen, eräpäivän, maturiteettihinnan sekä 30–50 strike-riviä. Pidä Strike-, Call-, Put-, SELL/BUY-, IV- ja mahdolliset Delta-sarakkeet kokonaan näkyvissä.</p>
+            <p>Kuvat voivat näyttää option chainin eri osia. Pidä tuotteen nimi, eräpäivä, maturiteettihinta sekä Strike-, Call-, Put-, SELL/BUY-, IV- ja mahdolliset Delta-sarakkeet näkyvissä.</p>
           </div>
         </div>
         <div class="panel-body">
@@ -721,7 +721,7 @@
               <h3>Näin saat parhaan tuloksen</h3>
               <ul>
                 <li>Ota rajaus näppäimillä Win + Shift + S ja liitä se tähän painamalla Ctrl + V.</li>
-                <li>Voit ladata 1–4 kuvaa samasta eräpäivästä. Ota kuvat ketjun peräkkäisistä osista ja jätä muutama päällekkäinen strike tarkistusta varten.</li>
+                <li>Voit ladata 1–4 kuvaa samasta eräpäivästä. Kaikkien strikejen ei tarvitse näkyä yhdessä kuvassa: ota erikseen riittävä OTM put- ja OTM call -alue ja jätä muutama päällekkäinen strike tarkistusta varten.</li>
                 <li>Pidä Strike-, Call-, Put-, SELL/BUY-, IV- ja mahdolliset Delta-sarakkeet sekä niiden otsikot näkyvissä.</li>
                 <li>Varmista, etteivät hinnat ole katkenneet kuvan reunoista.</li>
                 <li>Tarkista aina kuvanluvusta syntynyt taulukko ennen laskentaa.</li>
@@ -965,7 +965,7 @@
             tr.appendChild(removeCell);
             chainBody.appendChild(tr);
           });
-        rowCount.textContent = `${chainRows.length} strike-riviä. Tarvitaan vähintään yksi OTM put ja yksi OTM call.`;
+        rowCount.textContent = `${chainRows.length} yksilöllistä strike-riviä. Riittävyys tarkistetaan erikseen OTM put- ja OTM call -puolelta tavoitedeltoille.`;
       }
 
       function saveState() {
@@ -1782,12 +1782,12 @@ ${combinedText || "Tekstiä ei tunnistettu."}`);
           [row.callSell, row.callBuy].every(Number.isFinite) &&
           row.callBuy >= row.callSell
         );
-        const puts = quotedPuts.filter((row) => Number.isFinite(row.putIv));
-        const calls = quotedCalls.filter((row) => Number.isFinite(row.callIv));
+        const puts = quotedPuts.filter((row) => Number.isFinite(row.putDelta) || Number.isFinite(row.putIv));
+        const calls = quotedCalls.filter((row) => Number.isFinite(row.callDelta) || Number.isFinite(row.callIv));
         if (!quotedPuts.length) messages.push("Kuvasta ei löytynyt OTM put -rivin SELL- ja BUY-hintoja.");
-        else if (!puts.length) messages.push("OTM put -riveiltä puuttuu IV, jota tarvitaan delta-arvioon.");
+        else if (!puts.length) messages.push("OTM put -riveiltä puuttuu sekä delta että IV, jonka avulla delta voidaan arvioida.");
         if (!quotedCalls.length) messages.push("Kuvasta ei löytynyt OTM call -rivin SELL- ja BUY-hintoja.");
-        else if (!calls.length) messages.push("OTM call -riveiltä puuttuu IV, jota tarvitaan delta-arvioon.");
+        else if (!calls.length) messages.push("OTM call -riveiltä puuttuu sekä delta että IV, jonka avulla delta voidaan arvioida.");
         return { messages, puts, calls };
       }
 
@@ -1895,8 +1895,8 @@ ${combinedText || "Tekstiä ei tunnistettu."}`);
           );
 
         if (insufficientData) {
-          resultLead.textContent = `Kuvasta löytyi ${rows.length} strike-riviä, mutta tavoitedeltoille ei löytynyt kolmea erillistä put- ja call-strikeä.`;
-          resultsBody.innerHTML = `<div class="notice danger"><strong>Option chainin data-alue ei riitä.</strong> Kuvasta löytyi ${rows.length} strike-riviä: ${puts.length} käyttökelpoista OTM put -riviä ja ${calls.length} OTM call -riviä. Konservatiivinen, tasapainoinen ja aggressiivinen malli tarvitsevat kukin eri striket, joiden deltat kattavat tavoitealueen 0,125–0,225. Lataa laajempi kuva, jossa näkyy noin 30–50 strike-riviä sekä Strike-, Call-, Put-, SELL/BUY- ja IV-sarakkeet.</div>`;
+          resultLead.textContent = `Yhdistetystä datasta ei löytynyt tavoitedeltoille kolmea erillistä OTM put- ja OTM call -strikeä.`;
+          resultsBody.innerHTML = `<div class="notice danger"><strong>Option chainin tavoitedelta-alue ei vielä riitä.</strong> Yhdistetyssä datassa on ${puts.length} käyttökelpoista OTM put -riviä ja ${calls.length} OTM call -riviä. Konservatiivinen, tasapainoinen ja aggressiivinen malli tarvitsevat kummaltakin puolelta eri striket, joiden deltat kattavat tavoitealueen 0,125–0,225. Lisää tarvittaessa erillinen kuva puuttuvalta OTM put- tai OTM call -alueelta; kaikkien strikejen ei tarvitse näkyä samassa kuvassa.</div>`;
           resultsPanel.classList.add("visible");
           resultsPanel.scrollIntoView({ behavior: "smooth", block: "start" });
           return;
