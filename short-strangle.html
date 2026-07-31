@@ -61,7 +61,7 @@
     }
 
     .header-inner {
-      width: min(1180px, calc(100% - 32px));
+      width: min(1560px, calc(100% - 32px));
       margin: auto;
       padding: 20px 0 24px;
     }
@@ -119,7 +119,7 @@
     }
 
     main {
-      width: min(1180px, calc(100% - 32px));
+      width: min(1560px, calc(100% - 32px));
       margin: 28px auto 52px;
     }
 
@@ -170,12 +170,12 @@
 
     .upload-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(280px, .9fr);
+      grid-template-columns: minmax(0, 1.55fr) minmax(260px, .45fr);
       gap: 20px;
     }
 
     .drop-zone {
-      min-height: 270px;
+      min-height: clamp(620px, 72vh, 900px);
       display: grid;
       place-items: center;
       position: relative;
@@ -218,7 +218,7 @@
     #imagePreview {
       display: none;
       width: 100%;
-      max-height: 430px;
+      max-height: 900px;
       object-fit: contain;
       background: #eef2f0;
     }
@@ -357,6 +357,26 @@
       overflow-x: auto;
       border: 1px solid var(--line);
       border-radius: 12px;
+    }
+
+    .chain-table-wrap {
+      max-height: min(1500px, 82vh);
+      overflow: auto;
+    }
+
+    .chain-table-wrap table { min-width: 1040px; }
+    .chain-table-wrap thead th {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      box-shadow: 0 1px 0 var(--line);
+    }
+    .chain-table-wrap th:first-child { z-index: 4; }
+    .chain-table-wrap th,
+    .chain-table-wrap td { padding: 5px 6px; }
+    .chain-table-wrap td input {
+      width: 108px;
+      padding: 5px 6px;
     }
 
     table {
@@ -598,7 +618,7 @@
     }
 
     footer {
-      width: min(1180px, calc(100% - 32px));
+      width: min(1560px, calc(100% - 32px));
       margin: 0 auto 30px;
       color: var(--muted);
       text-align: center;
@@ -614,7 +634,7 @@
     }
 
     @media (max-width: 620px) {
-      .header-inner, main, footer { width: min(100% - 20px, 1180px); }
+      .header-inner, main, footer { width: min(100% - 20px, 1560px); }
       .privacy-badge { display: none; }
       .panel-head { padding: 18px 16px 8px; }
       .panel-body { padding: 10px 16px 20px; }
@@ -647,7 +667,7 @@
           <div class="step-number">1</div>
           <div>
             <h2 id="uploadTitle">Lataa optioketjun kuva</h2>
-            <p>Paras kuva näyttää tuotteen, eräpäivän, maturiteettihinnan, striket sekä SELL-, BUY- ja IV-sarakkeet.</p>
+            <p>Paras kuva näyttää tuotteen, eräpäivän, maturiteettihinnan sekä 30–50 strike-riviä. Pidä Strike-, Call-, Put-, SELL/BUY- ja IV-sarakkeet kokonaan näkyvissä.</p>
           </div>
         </div>
         <div class="panel-body">
@@ -674,8 +694,8 @@
               <h3>Näin saat parhaan tuloksen</h3>
               <ul>
                 <li>Ota rajaus näppäimillä Win + Shift + S ja liitä se tähän painamalla Ctrl + V.</li>
-                <li>Ota kuva yhdestä eräpäivästä ja niin monesta strike-rivistä kuin mahdollista.</li>
-                <li>Pidä CALLS-, STRIKE- ja PUTS-otsikot näkyvissä.</li>
+                <li>Ota kuva yhdestä eräpäivästä. Tavoite on saada samaan kuvakaappaukseen noin 30–50 strike-riviä.</li>
+                <li>Pidä Strike-, Call-, Put-, SELL/BUY- ja IV-sarakkeet sekä niiden otsikot näkyvissä.</li>
                 <li>Varmista, etteivät hinnat ole katkenneet kuvan reunoista.</li>
                 <li>Tarkista aina kuvanluvusta syntynyt taulukko ennen laskentaa.</li>
               </ul>
@@ -739,7 +759,7 @@
             </div>
           </div>
 
-          <div class="table-wrap">
+          <div class="table-wrap chain-table-wrap">
             <table aria-label="Optioketjun hinnat">
               <thead>
                 <tr>
