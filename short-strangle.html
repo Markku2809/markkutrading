@@ -1756,14 +1756,50 @@
         const expiryDate = new Date(`${config.expiry}T12:00:00`);
         const dte = Math.round((expiryDate - now) / 86400000);
         const years = dte / 365;
-        const allCandidates = [];
-        puts.forEach((put) => calls.forEach((call) => {
-          allCandidates.push(buildCandidate(put, call, config, years, [-.10, -.05, .05, .10]));
-        }));
+        const usedPutStrikes = new Set();
+        const usedCallStrikes = new Set();
 
-        const selections = targets.map((target) => ({
+        function closestUnusedLeg(rowsForSide, type, targetDelta, usedStrikes) {
+          return rowsForSide
+            .map((row) => {
+              const iv = type === "put" ? row.putIv : row.callIv;
+              const delta = Math.abs(estimateDelta(type, config.forward, row.strike, iv, years));
+              return { row, delta, difference: Math.abs(delta - targetDelta) };
+            })
+            .filter((item) => Number.isFinite(item.delta) && !usedStrikes.has(item.row.strike))
+            .sort((a, b) => a.difference - b.difference)[0] || null;
+        }
+
+        const legSelections = targets.map((target) => {
+          const putMatch = closestUnusedLeg(puts, "put", target.delta, usedPutStrikes);
+          const callMatch = closestUnusedLeg(calls, "call", target.delta, usedCallStrikes);
+          if (putMatch) usedPutStrikes.add(putMatch.row.strike);
+          if (callMatch) usedCallStrikes.add(callMatch.row.strike);
+          return { target, putMatch, callMatch };
+        });
+
+        const deltaTolerance = 0.055;
+        const insufficientData =
+          puts.length < targets.length ||
+          calls.length < targets.length ||
+          legSelections.some(({ putMatch, callMatch, target }) =>
+            !putMatch ||
+            !callMatch ||
+            Math.abs(putMatch.delta - target.delta) > deltaTolerance ||
+            Math.abs(callMatch.delta - target.delta) > deltaTolerance
+          );
+
+        if (insufficientData) {
+          resultLead.textContent = `Kuvasta löytyi ${rows.length} strike-riviä, mutta tavoitedeltoille ei löytynyt kolmea erillistä put- ja call-strikeä.`;
+          resultsBody.innerHTML = `<div class="notice danger"><strong>Option chainin data-alue ei riitä.</strong> Kuvasta löytyi ${rows.length} strike-riviä: ${puts.length} käyttökelpoista OTM put -riviä ja ${calls.length} OTM call -riviä. Konservatiivinen, tasapainoinen ja aggressiivinen malli tarvitsevat kukin eri striket, joiden deltat kattavat tavoitealueen 0,125–0,225. Lataa laajempi kuva, jossa näkyy noin 30–50 strike-riviä sekä Strike-, Call-, Put-, SELL/BUY- ja IV-sarakkeet.</div>`;
+          resultsPanel.classList.add("visible");
+          resultsPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+          return;
+        }
+
+        const selections = legSelections.map(({ target, putMatch, callMatch }) => ({
           ...target,
-          candidate: [...allCandidates].sort((a, b) => targetScore(a, target.delta) - targetScore(b, target.delta))[0]
+          candidate: buildCandidate(putMatch.row, callMatch.row, config, years, [-.10, -.05, .05, .10])
         }));
 
         const atmIv = inferAtmIv(rows, config.forward);
