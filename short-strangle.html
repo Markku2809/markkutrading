@@ -215,12 +215,39 @@
     .drop-copy strong { display: block; font-size: 19px; }
     .drop-copy span { color: var(--muted); font-size: 14px; }
 
-    #imagePreview {
+    .image-preview-grid {
       display: none;
       width: 100%;
-      max-height: 900px;
-      object-fit: contain;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      padding: 10px;
       background: #eef2f0;
+    }
+
+    .image-preview-card {
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid #c7d9d1;
+      border-radius: 10px;
+      background: white;
+    }
+
+    .image-preview-card img {
+      display: block;
+      width: 100%;
+      max-height: 430px;
+      object-fit: contain;
+      background: #f5f7f6;
+    }
+
+    .image-preview-card span {
+      display: block;
+      padding: 6px 8px;
+      color: var(--muted);
+      font-size: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .image-actions {
@@ -666,36 +693,36 @@
         <div class="panel-head">
           <div class="step-number">1</div>
           <div>
-            <h2 id="uploadTitle">Lataa optioketjun kuva</h2>
-            <p>Paras kuva näyttää tuotteen, eräpäivän, maturiteettihinnan sekä 30–50 strike-riviä. Pidä Strike-, Call-, Put-, SELL/BUY- ja IV-sarakkeet kokonaan näkyvissä.</p>
+            <h2 id="uploadTitle">Lataa optioketjun kuvat</h2>
+            <p>Paras kuva näyttää tuotteen, eräpäivän, maturiteettihinnan sekä 30–50 strike-riviä. Pidä Strike-, Call-, Put-, SELL/BUY-, IV- ja mahdolliset Delta-sarakkeet kokonaan näkyvissä.</p>
           </div>
         </div>
         <div class="panel-body">
           <div class="upload-grid">
             <div>
-              <input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+              <input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp" multiple hidden>
               <label class="drop-zone" id="dropZone" for="imageInput" tabindex="0">
                 <div class="drop-copy" id="dropCopy">
                   <div class="drop-icon">▣</div>
                   <strong>Valitse, pudota tai liitä kuva</strong>
-                  <span>PNG, JPG tai WEBP · liitä leikepöydältä Ctrl + V</span>
+                  <span>Valitse 1–4 PNG-, JPG- tai WEBP-kuvaa · lisää leikepöydältä Ctrl + V</span>
                 </div>
-                <img id="imagePreview" alt="Ladatun optioketjun esikatselu">
+                <div class="image-preview-grid" id="imagePreviewGrid" aria-label="Valittujen optioketjukuvien esikatselu"></div>
               </label>
               <div class="image-actions">
-                <button class="primary-button" id="readImageButton" type="button" disabled>Lue hinnat kuvasta</button>
+                <button class="primary-button" id="readImageButton" type="button" disabled>Lue hinnat kuvista</button>
                 <button class="ghost-button" id="pasteImageButton" type="button">Liitä kuva (Ctrl+V)</button>
-                <button class="ghost-button" id="chooseAnotherButton" type="button" hidden>Vaihda kuva</button>
+                <button class="ghost-button" id="chooseAnotherButton" type="button" hidden>Vaihda kuvat</button>
               </div>
               <div class="progress" aria-hidden="true"><span id="ocrProgress"></span></div>
-              <p class="status" id="ocrStatus" aria-live="polite">Kuvaa ei ole vielä valittu.</p>
+              <p class="status" id="ocrStatus" aria-live="polite">Kuvia ei ole vielä valittu. OCR käyttää alkuperäistä resoluutiota.</p>
             </div>
             <aside class="tip-card">
               <h3>Näin saat parhaan tuloksen</h3>
               <ul>
                 <li>Ota rajaus näppäimillä Win + Shift + S ja liitä se tähän painamalla Ctrl + V.</li>
-                <li>Ota kuva yhdestä eräpäivästä. Tavoite on saada samaan kuvakaappaukseen noin 30–50 strike-riviä.</li>
-                <li>Pidä Strike-, Call-, Put-, SELL/BUY- ja IV-sarakkeet sekä niiden otsikot näkyvissä.</li>
+                <li>Voit ladata 1–4 kuvaa samasta eräpäivästä. Ota kuvat ketjun peräkkäisistä osista ja jätä muutama päällekkäinen strike tarkistusta varten.</li>
+                <li>Pidä Strike-, Call-, Put-, SELL/BUY-, IV- ja mahdolliset Delta-sarakkeet sekä niiden otsikot näkyvissä.</li>
                 <li>Varmista, etteivät hinnat ole katkenneet kuvan reunoista.</li>
                 <li>Tarkista aina kuvanluvusta syntynyt taulukko ennen laskentaa.</li>
               </ul>
@@ -765,10 +792,12 @@
                 <tr>
                   <th>Strike</th>
                   <th>Call IV %</th>
+                  <th>Call Δ</th>
                   <th>Call SELL</th>
                   <th>Call BUY</th>
                   <th>Put SELL</th>
                   <th>Put BUY</th>
+                  <th>Put Δ</th>
                   <th>Put IV %</th>
                   <th><span class="visually-hidden">Poista</span></th>
                 </tr>
@@ -833,7 +862,7 @@
 
       const chainBody = document.getElementById("chainBody");
       const imageInput = document.getElementById("imageInput");
-      const imagePreview = document.getElementById("imagePreview");
+      const imagePreviewGrid = document.getElementById("imagePreviewGrid");
       const dropCopy = document.getElementById("dropCopy");
       const dropZone = document.getElementById("dropZone");
       const readImageButton = document.getElementById("readImageButton");
@@ -848,12 +877,12 @@
       const resultsBody = document.getElementById("resultsBody");
       const resultLead = document.getElementById("resultLead");
 
-      let selectedFile = null;
-      let previewUrl = null;
+      let selectedFiles = [];
+      let previewUrls = [];
       let chainRows = [];
 
       function blankRow() {
-        return { strike: "", callIv: "", callSell: "", callBuy: "", putSell: "", putBuy: "", putIv: "" };
+        return { strike: "", callIv: "", callDelta: "", callSell: "", callBuy: "", putSell: "", putBuy: "", putDelta: "", putIv: "" };
       }
 
       function formatNumber(value, maximumFractionDigits = 2) {
@@ -905,14 +934,14 @@
           .sort((a, b) => (numberValue(a.strike) || 0) - (numberValue(b.strike) || 0))
           .forEach((row, index) => {
             const tr = document.createElement("tr");
-            const keys = ["strike", "callIv", "callSell", "callBuy", "putSell", "putBuy", "putIv"];
+            const keys = ["strike", "callIv", "callDelta", "callSell", "callBuy", "putSell", "putBuy", "putDelta", "putIv"];
             keys.forEach((key) => {
               const td = document.createElement("td");
               const input = document.createElement("input");
               input.type = "number";
               input.step = "0.01";
               input.inputMode = "decimal";
-              input.value = row[key];
+              input.value = row[key] ?? "";
               input.setAttribute("aria-label", `${key}, rivi ${index + 1}`);
               input.addEventListener("input", () => {
                 chainRows[index][key] = input.value;
@@ -962,17 +991,36 @@
 
       Object.values(fields).forEach((field) => field.addEventListener("input", saveState));
 
-      function showSelectedImage(file) {
-        selectedFile = file;
-        if (previewUrl) URL.revokeObjectURL(previewUrl);
-        previewUrl = URL.createObjectURL(file);
-        imagePreview.src = previewUrl;
-        imagePreview.style.display = "block";
-        dropCopy.style.display = "none";
-        readImageButton.disabled = false;
-        chooseAnotherButton.hidden = false;
-        ocrStatus.textContent = `${file.name} valittu. Aloita painamalla “Lue hinnat kuvasta”.`;
+      function showSelectedImages(files, { append = false } = {}) {
+        const incoming = Array.from(files || []).filter((file) => file.type.startsWith("image/"));
+        const combined = append ? [...selectedFiles, ...incoming] : incoming;
+        selectedFiles = combined.slice(0, 4);
+
+        previewUrls.forEach((url) => URL.revokeObjectURL(url));
+        previewUrls = [];
+        imagePreviewGrid.innerHTML = "";
+        selectedFiles.forEach((file, index) => {
+          const url = URL.createObjectURL(file);
+          previewUrls.push(url);
+          const card = document.createElement("figure");
+          card.className = "image-preview-card";
+          const image = document.createElement("img");
+          image.src = url;
+          image.alt = `Option chain -kuva ${index + 1}`;
+          const caption = document.createElement("figcaption");
+          caption.textContent = `${index + 1}. ${file.name}`;
+          card.append(image, caption);
+          imagePreviewGrid.appendChild(card);
+        });
+
+        imagePreviewGrid.style.display = selectedFiles.length ? "grid" : "none";
+        dropCopy.style.display = selectedFiles.length ? "none" : "block";
+        readImageButton.disabled = !selectedFiles.length;
+        chooseAnotherButton.hidden = !selectedFiles.length;
         ocrProgress.style.width = "0";
+        if (!selectedFiles.length) return;
+        const limited = combined.length > 4 ? " Vain ensimmäiset neljä kuvaa otettiin mukaan." : "";
+        ocrStatus.textContent = `${selectedFiles.length} kuvaa valittu. Kuvat luetaan alkuperäisellä resoluutiolla.${limited}`;
       }
 
       function clipboardImageFile(blob) {
@@ -988,12 +1036,12 @@
       }
 
       function showClipboardImage(blob) {
-        showSelectedImage(clipboardImageFile(blob));
-        ocrStatus.textContent = "Leikepöydän kuva liitetty. Aloita painamalla “Lue hinnat kuvasta”.";
+        showSelectedImages([clipboardImageFile(blob)], { append: true });
+        ocrStatus.textContent = `Leikepöydän kuva lisätty (${selectedFiles.length}/4). Kuvat luetaan alkuperäisellä resoluutiolla.`;
       }
 
       imageInput.addEventListener("change", () => {
-        if (imageInput.files && imageInput.files[0]) showSelectedImage(imageInput.files[0]);
+        if (imageInput.files?.length) showSelectedImages(imageInput.files);
       });
 
       chooseAnotherButton.addEventListener("click", () => imageInput.click());
@@ -1001,7 +1049,7 @@
       document.addEventListener("paste", (event) => {
         const items = Array.from(event.clipboardData?.items || []);
         const imageItem = items.find((item) => item.type.startsWith("image/"));
-        if (!imageItem) return;
+        if (!imageItem || selectedFiles.length >= 4) return;
         const file = imageItem.getAsFile();
         if (!file) return;
         event.preventDefault();
@@ -1009,6 +1057,10 @@
       });
 
       pasteImageButton.addEventListener("click", async () => {
+        if (selectedFiles.length >= 4) {
+          ocrStatus.textContent = "Enimmäismäärä on neljä kuvaa.";
+          return;
+        }
         if (navigator.clipboard?.read) {
           try {
             const items = await navigator.clipboard.read();
@@ -1043,10 +1095,9 @@
       });
 
       dropZone.addEventListener("drop", (event) => {
-        const files = Array.from(event.dataTransfer?.files || []);
-        const file = files.find((candidate) => candidate.type.startsWith("image/"));
-        if (file) {
-          showSelectedImage(file);
+        const files = Array.from(event.dataTransfer?.files || []).filter((file) => file.type.startsWith("image/"));
+        if (files.length) {
+          showSelectedImages(files);
           return;
         }
         ocrStatus.textContent = "Pudotuksesta ei löytynyt kuvatiedostoa. Jos kuva on leikepöydällä, paina Ctrl + V.";
@@ -1054,11 +1105,9 @@
 
       async function makeOcrCanvas(file) {
         const image = await createImageBitmap(file);
-        const maximumWidth = 2400;
-        const scale = Math.min(1, maximumWidth / image.width);
         const canvas = document.createElement("canvas");
-        canvas.width = Math.round(image.width * scale);
-        canvas.height = Math.round(image.height * scale);
+        canvas.width = image.width;
+        canvas.height = image.height;
         const context = canvas.getContext("2d", { willReadFrequently: true });
         context.drawImage(image, 0, 0, canvas.width, canvas.height);
         const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
@@ -1076,7 +1125,7 @@
 
       function makeOcrHeaderCanvas(canvas) {
         const sourceHeight = Math.min(canvas.height, Math.max(320, Math.round(canvas.height * .34)));
-        const scale = Math.min(3, 4800 / canvas.width);
+        const scale = Math.max(1, Math.min(3, 4800 / canvas.width));
         const headerCanvas = document.createElement("canvas");
         headerCanvas.width = Math.round(canvas.width * scale);
         headerCanvas.height = Math.round(sourceHeight * scale);
@@ -1117,6 +1166,13 @@
 
       function closestHeader(words, name, side, strikeX) {
         const matching = words.filter((word) => normalizedWord(word) === name);
+        const sided = matching.filter((word) => side === "left" ? wordCenter(word).x < strikeX : wordCenter(word).x > strikeX);
+        if (!sided.length) return null;
+        return sided.sort((a, b) => Math.abs(wordCenter(a).x - strikeX) - Math.abs(wordCenter(b).x - strikeX))[0];
+      }
+
+      function closestDeltaHeader(words, side, strikeX) {
+        const matching = words.filter((word) => normalizedWord(word) === "DELTA" || String(word.text || "").includes("Δ"));
         const sided = matching.filter((word) => side === "left" ? wordCenter(word).x < strikeX : wordCenter(word).x > strikeX);
         if (!sided.length) return null;
         return sided.sort((a, b) => Math.abs(wordCenter(a).x - strikeX) - Math.abs(wordCenter(b).x - strikeX))[0];
@@ -1349,11 +1405,13 @@
         const headerY = strikeCenter.y;
         const headerMap = {
           callIv: closestHeader(words, "IV", "left", strikeCenter.x),
+          callDelta: closestDeltaHeader(words, "left", strikeCenter.x),
           callSell: closestHeader(words, "SELL", "left", strikeCenter.x),
           callBuy: closestHeader(words, "BUY", "left", strikeCenter.x),
           strike: strikeWord,
           putSell: closestHeader(words, "SELL", "right", strikeCenter.x),
           putBuy: closestHeader(words, "BUY", "right", strikeCenter.x),
+          putDelta: closestDeltaHeader(words, "right", strikeCenter.x),
           putIv: closestHeader(words, "IV", "right", strikeCenter.x)
         };
 
@@ -1366,10 +1424,9 @@
           putBuy: canvasWidth * .78,
           putIv: canvasWidth * .91
         };
-        const columnX = Object.fromEntries(Object.entries(headerMap).map(([key, word]) => [
-          key,
-          word ? wordCenter(word).x : fallbackX[key]
-        ]));
+        const columnX = Object.fromEntries(Object.entries(headerMap)
+          .filter(([key, word]) => word || !key.toLowerCase().includes("delta"))
+          .map(([key, word]) => [key, word ? wordCenter(word).x : fallbackX[key]]));
 
         const numericWords = words
           .map((word) => ({ word, value: numberValue(word.text), ...wordCenter(word) }))
@@ -1435,68 +1492,96 @@
       }
 
       readImageButton.addEventListener("click", async () => {
-        if (!selectedFile) return;
+        if (!selectedFiles.length) return;
         if (!window.Tesseract) {
           ocrStatus.textContent = "Kuvanlukijaa ei saatu ladattua. Tarkista verkkoyhteys ja yritä uudelleen.";
           return;
         }
         readImageButton.disabled = true;
-        ocrStatus.textContent = "Valmistellaan kuvaa…";
-        ocrProgress.style.width = "4%";
+        ocrStatus.textContent = "Valmistellaan kuvia alkuperäisellä resoluutiolla…";
+        ocrProgress.style.width = "2%";
 
+        let worker = null;
+        let currentImageIndex = 0;
         try {
-          const canvas = await makeOcrCanvas(selectedFile);
-          const worker = await Tesseract.createWorker("eng", 1, {
+          const totalImages = selectedFiles.length;
+          worker = await Tesseract.createWorker("eng", 1, {
             workerPath: "vendor/tesseract/worker.min.js",
             corePath: "vendor/tesseract/core",
             langPath: "vendor/tesseract/lang",
             logger(message) {
               if (message.status === "recognizing text") {
-                const progress = Math.round((message.progress || 0) * 92) + 6;
-                ocrProgress.style.width = `${progress}%`;
-                ocrStatus.textContent = `Luetaan hintoja… ${Math.round((message.progress || 0) * 100)} %`;
+                const aggregate = (currentImageIndex + (message.progress || 0)) / totalImages;
+                const progress = Math.round(aggregate * 94) + 4;
+                ocrProgress.style.width = `${Math.min(98, progress)}%`;
+                ocrStatus.textContent = `Luetaan kuvaa ${currentImageIndex + 1}/${totalImages} alkuperäisellä resoluutiolla… ${Math.round((message.progress || 0) * 100)} %`;
               } else if (message.status) {
-                ocrStatus.textContent = "Kuvanlukija valmistautuu…";
+                ocrStatus.textContent = `Kuvanlukija valmistautuu kuvaan ${currentImageIndex + 1}/${totalImages}…`;
               }
             }
           });
-          const result = await worker.recognize(canvas, {}, { text: true, blocks: true });
-          let headerText = "";
-          try {
+
+          let mergedRows = [];
+          let sourceRowCount = 0;
+          let detectedUnderlying = "";
+          let detectedExpiry = { value: "", estimated: false };
+          let detectedMaturity = NaN;
+          const recognizedSections = [];
+
+          for (currentImageIndex = 0; currentImageIndex < totalImages; currentImageIndex += 1) {
+            const file = selectedFiles[currentImageIndex];
+            const canvas = await makeOcrCanvas(file);
             await worker.setParameters({
-              tessedit_pageseg_mode: "6",
+              tessedit_pageseg_mode: "3",
               preserve_interword_spaces: "1"
             });
-            const headerResult = await worker.recognize(makeOcrHeaderCanvas(canvas), {}, { text: true });
-            headerText = headerResult.data.text || "";
-          } catch (headerError) {
-            console.info("Otsikon tarkennettu luku ei onnistunut.", headerError);
+            const result = await worker.recognize(canvas, {}, { text: true, blocks: true });
+            let headerText = "";
+            try {
+              await worker.setParameters({
+                tessedit_pageseg_mode: "6",
+                preserve_interword_spaces: "1"
+              });
+              const headerResult = await worker.recognize(makeOcrHeaderCanvas(canvas), {}, { text: true });
+              headerText = headerResult.data.text || "";
+            } catch (headerError) {
+              console.info(`Kuvan ${currentImageIndex + 1} otsikon tarkennettu luku ei onnistunut.`, headerError);
+            }
+
+            const text = result.data.text || "";
+            const combinedText = `${text}
+${headerText}`.trim();
+            recognizedSections.push(`--- Kuva ${currentImageIndex + 1}: ${file.name} ---
+${combinedText || "Tekstiä ei tunnistettu."}`);
+            const words = flattenWords(result.data);
+            const coordinateParsed = parseRowsFromOcr(words, canvas.width, canvas.height);
+            const imageMaturity = Number.isFinite(coordinateParsed.maturityPrice)
+              ? coordinateParsed.maturityPrice
+              : parseMaturityFromText(combinedText);
+            const fallbackRows = parseRowsFromText(text, imageMaturity);
+            const imageRows = mergeParsedRows(coordinateParsed.rows, fallbackRows);
+            sourceRowCount += imageRows.length;
+            mergedRows = mergeParsedRows(mergedRows, imageRows);
+
+            if (!detectedUnderlying) detectedUnderlying = parseUnderlyingFromText(combinedText);
+            if (!detectedExpiry.value) detectedExpiry = parseExpiryFromText(combinedText);
+            if (!Number.isFinite(detectedMaturity) && Number.isFinite(imageMaturity)) detectedMaturity = imageMaturity;
           }
-          await worker.terminate();
 
-          const text = result.data.text || "";
-          const combinedText = `${text}\n${headerText}`.trim();
-          const words = flattenWords(result.data);
-          const coordinateParsed = parseRowsFromOcr(words, canvas.width, canvas.height);
-          const maturityPrice = Number.isFinite(coordinateParsed.maturityPrice)
-            ? coordinateParsed.maturityPrice
-            : parseMaturityFromText(combinedText);
-          const fallbackRows = parseRowsFromText(text, maturityPrice);
-          const completed = completeParsedRows(mergeParsedRows(coordinateParsed.rows, fallbackRows));
-          ocrText.textContent = combinedText || "Tekstiä ei tunnistettu.";
-
-          const underlying = parseUnderlyingFromText(combinedText);
-          const expiry = parseExpiryFromText(combinedText);
-          fields.underlying.value = underlying;
-          fields.expiry.value = expiry.value;
-          fields.maturityPrice.value = Number.isFinite(maturityPrice) ? maturityPrice : "";
+          const completed = completeParsedRows(mergedRows);
+          const duplicatesRemoved = Math.max(0, sourceRowCount - mergedRows.length);
+          ocrText.textContent = recognizedSections.join("\n\n");
+          if (detectedUnderlying) fields.underlying.value = detectedUnderlying;
+          if (detectedExpiry.value) fields.expiry.value = detectedExpiry.value;
+          if (Number.isFinite(detectedMaturity)) fields.maturityPrice.value = detectedMaturity;
           chainRows = completed.rows;
           renderTable();
           saveState();
           ocrProgress.style.width = "100%";
 
-          const notices = [];
-          if (expiry.estimated) notices.push("Eräpäivä arvioitiin kuukausisopimuksen kolmanneksi perjantaiksi – tarkista päivämäärä.");
+          const notices = [`${totalImages} kuvaa yhdistettiin strike-hinnan perusteella.`];
+          if (duplicatesRemoved) notices.push(`${duplicatesRemoved} päällekkäistä strike-riviä yhdistettiin.`);
+          if (detectedExpiry.estimated) notices.push("Eräpäivä arvioitiin kuukausisopimuksen kolmanneksi perjantaiksi – tarkista päivämäärä.");
           if (completed.estimatedIvCount) notices.push(`${completed.estimatedIvCount} puuttuvaa IV-arvoa täydennettiin saman striken toiselta puolelta.`);
           if (completed.repairedQuoteCount) notices.push(`${completed.repairedQuoteCount} OCR:n desimaalivirhettä korjattiin.`);
 
@@ -1504,21 +1589,24 @@
           const validatedRows = validatedOptions();
           const validation = validate(config, validatedRows);
           if (completed.rows.length >= 2 && !validation.messages.length) {
-            ocrStatus.textContent = `Valmis: ${completed.rows.length} strike-riviä täytettiin ja avauspaikat laskettiin. ${notices.join(" ")}`.trim();
+            ocrStatus.textContent = `Valmis: ${completed.rows.length} yksilöllistä strike-riviä. Strategia laskettiin vasta yhdistetystä datasta. ${notices.join(" ")}`.trim();
             document.getElementById("analyzeButton").click();
           } else if (completed.rows.length >= 2) {
-            ocrStatus.textContent = `Valmis: ${completed.rows.length} strike-riviä täytettiin. ${notices.join(" ")} Tarkista vain korostetut puutteet.`.trim();
+            ocrStatus.textContent = `Valmis: ${completed.rows.length} yksilöllistä strike-riviä. ${notices.join(" ")} Tarkista vain korostetut puutteet.`.trim();
             showValidation(validation.messages);
             document.getElementById("verifyTitle").scrollIntoView({ behavior: "smooth", block: "start" });
           } else {
-            ocrStatus.textContent = "Kuva luettiin, mutta rivejä löytyi liian vähän. Rajaa kuva koko optionketjuun tai täytä taulukko käsin.";
+            ocrStatus.textContent = `Kuvat luettiin ja yhdistettiin, mutta yksilöllisiä strike-rivejä löytyi liian vähän. ${notices.join(" ")}`;
             document.getElementById("ocrDetails").open = true;
           }
         } catch (error) {
           console.error(error);
-          ocrStatus.textContent = "Kuvan luku epäonnistui. Voit vaihtaa kuvan tai syöttää hinnat taulukkoon käsin.";
+          ocrStatus.textContent = "Kuvien luku epäonnistui. Voit vaihtaa kuvat tai syöttää hinnat taulukkoon käsin.";
           ocrProgress.style.width = "0";
         } finally {
+          if (worker) {
+            try { await worker.terminate(); } catch (error) { console.info("Kuvanlukijan sulkeminen epäonnistui.", error); }
+          }
           readImageButton.disabled = false;
         }
       });
@@ -1530,6 +1618,17 @@
 
       document.getElementById("clearButton").addEventListener("click", () => {
         chainRows = [];
+        selectedFiles = [];
+        previewUrls.forEach((url) => URL.revokeObjectURL(url));
+        previewUrls = [];
+        imageInput.value = "";
+        imagePreviewGrid.innerHTML = "";
+        imagePreviewGrid.style.display = "none";
+        dropCopy.style.display = "block";
+        readImageButton.disabled = true;
+        chooseAnotherButton.hidden = true;
+        ocrStatus.textContent = "Valitse 1–4 kuvaa aloittaaksesi.";
+        ocrProgress.style.width = "0";
         Object.values(fields).forEach((field) => field.value = "");
         fields.pointValue.value = "1";
         fields.riskBudget.value = "300";
@@ -1646,10 +1745,12 @@
         return chainRows.map((row) => ({
           strike: numberValue(row.strike),
           callIv: numberValue(row.callIv),
+          callDelta: numberValue(row.callDelta),
           callSell: numberValue(row.callSell),
           callBuy: numberValue(row.callBuy),
           putSell: numberValue(row.putSell),
           putBuy: numberValue(row.putBuy),
+          putDelta: numberValue(row.putDelta),
           putIv: numberValue(row.putIv)
         }));
       }
@@ -1691,8 +1792,10 @@
       }
 
       function buildCandidate(put, call, config, years, scenarioMoves) {
-        const putDelta = estimateDelta("put", config.forward, put.strike, put.putIv, years);
-        const callDelta = estimateDelta("call", config.forward, call.strike, call.callIv, years);
+        const estimatedPutDelta = estimateDelta("put", config.forward, put.strike, put.putIv, years);
+        const estimatedCallDelta = estimateDelta("call", config.forward, call.strike, call.callIv, years);
+        const putDelta = Number.isFinite(put.putDelta) ? put.putDelta : estimatedPutDelta;
+        const callDelta = Number.isFinite(call.callDelta) ? call.callDelta : estimatedCallDelta;
         const credit = put.putSell + call.callSell;
         const spread = (put.putBuy - put.putSell) + (call.callBuy - call.callSell);
         const lowerBreakeven = put.strike - credit;
@@ -1763,7 +1866,9 @@
           return rowsForSide
             .map((row) => {
               const iv = type === "put" ? row.putIv : row.callIv;
-              const delta = Math.abs(estimateDelta(type, config.forward, row.strike, iv, years));
+              const capturedDelta = type === "put" ? row.putDelta : row.callDelta;
+              const estimatedDelta = estimateDelta(type, config.forward, row.strike, iv, years);
+              const delta = Math.abs(Number.isFinite(capturedDelta) ? capturedDelta : estimatedDelta);
               return { row, delta, difference: Math.abs(delta - targetDelta) };
             })
             .filter((item) => Number.isFinite(item.delta) && !usedStrikes.has(item.row.strike))
