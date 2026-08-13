@@ -1,58 +1,57 @@
 {
-  "decision": "epäselvä – ei treidiä",
-  "day_direction": "epäselvä",
-  "confidence": "heikko",
-  "summary": "US500-futuurin hinta, trendi ja momentum ovat ristiriidassa.",
+  "decision": "call-setup nyt",
+  "day_direction": "todennäköinen nousupäivä",
+  "confidence": "kohtalainen",
+  "summary": "US500-futuurin tuore hinta, lyhyt trendi ja momentum kallistuvat nousupäivään.",
   "reasons": [
-    "Hinta 7757.25 suhteessa EMA20-tasoon 7756.52 ja EMA50-tasoon 7762.80.",
-    "30 minuutin RSI(14) on 55.6.",
+    "Hinta 7776.50 suhteessa EMA20-tasoon 7773.81 ja EMA50-tasoon 7770.95.",
+    "30 minuutin RSI(14) on 63.2.",
     "Viimeisimmän 30 minuutin muutoksen suunta on +0.00 %.",
-    "Hintadatan ikä on 0.2 tuntia.",
-    "Ristiriita tarkoittaa kriteerien mukaan ei treidiä."
+    "Hintadatan ikä on 0.2 tuntia."
   ],
-  "rise_scenario": "Noususkenaario vahvistuu, jos US500-futuuri pysyy EMA20:n (7756.52) yläpuolella ja murtaa lasketun vastuksen 7796.00.",
-  "fall_scenario": "Laskuskenaario vahvistuu, jos hinta jää EMA20:n (7756.52) alle ja rikkoo lasketun tuen 7738.00.",
-  "invalidation": "Odota tuoretta hintaa ja selkeää rakennetta.",
-  "generated_at": "2026-08-12T09:44:08.873686+03:00",
+  "rise_scenario": "Noususkenaario vahvistuu, jos US500-futuuri pysyy EMA20:n (7773.81) yläpuolella ja murtaa lasketun vastuksen 7794.00.",
+  "fall_scenario": "Laskuskenaario vahvistuu, jos hinta jää EMA20:n (7773.81) alle ja rikkoo lasketun tuen 7755.50.",
+  "invalidation": "Nousunäkemys mitätöityy, jos hinta palautuu EMA20:n 7773.81 alle eikä palaudu nopeasti.",
+  "generated_at": "2026-08-13T09:47:57.842898+03:00",
   "instrument": "ES=F (US500/S&P 500 E-mini -viitefutuuri; ei varmennettu IG-instrumentti)",
-  "price_time": "2026-08-12T06:34:05+00:00",
-  "support": 7738.0,
-  "resistance": 7796.0,
-  "ema20": 7756.52,
-  "ema50": 7762.8,
-  "rsi14": 55.6,
+  "price_time": "2026-08-13T06:37:55+00:00",
+  "support": 7755.5,
+  "resistance": 7794.0,
+  "ema20": 7773.81,
+  "ema50": 7770.95,
+  "rsi14": 63.2,
   "markets": [
     {
       "name": "US500-futuuri",
-      "price": 7757.25,
+      "price": 7776.5,
       "change_pct": 0.0
     },
     {
       "name": "S&P 500 käteinen",
-      "price": 7728.2,
-      "change_pct": 0.01
+      "price": 7748.5,
+      "change_pct": -0.0
     },
     {
       "name": "Nasdaq 100",
-      "price": 29525.48,
-      "change_pct": 0.01
+      "price": 29742.6,
+      "change_pct": -0.0
     },
     {
       "name": "Kulta",
-      "price": 4449.6,
-      "change_pct": 0.0
+      "price": 4427.0,
+      "change_pct": -0.01
     },
     {
       "name": "DAX",
-      "price": 26391.42,
-      "change_pct": -0.0
+      "price": 26331.07,
+      "change_pct": -0.03
     }
   ],
   "sources": [
     {
       "title": "Yahoo Finance – S&P 500 E-mini Futures (ES=F)",
       "url": "https://finance.yahoo.com/quote/ES=F/",
-      "published_at": "2026-08-12T06:34:05+00:00"
+      "published_at": "2026-08-13T06:37:55+00:00"
     },
     {
       "title": "TradingView – OANDA US500 graafi",
