@@ -1,57 +1,58 @@
 {
-  "decision": "put-setup nyt",
-  "day_direction": "todennäköinen laskupäivä",
-  "confidence": "kohtalainen",
-  "summary": "US500-futuurin tuore hinta, lyhyt trendi ja momentum kallistuvat laskupäivään.",
+  "decision": "epäselvä – ei treidiä",
+  "day_direction": "epäselvä",
+  "confidence": "heikko",
+  "summary": "US500-futuurin hinta, trendi ja momentum ovat ristiriidassa.",
   "reasons": [
-    "Hinta 7700.00 suhteessa EMA20-tasoon 7710.04 ja EMA50-tasoon 7724.56.",
-    "30 minuutin RSI(14) on 34.7.",
-    "Viimeisimmän 30 minuutin muutoksen suunta on +0.00 %.",
-    "Hintadatan ikä on 0.2 tuntia."
+    "Hinta 7736.00 suhteessa EMA20-tasoon 7737.49 ja EMA50-tasoon 7734.04.",
+    "30 minuutin RSI(14) on 36.0.",
+    "Viimeisimmän 30 minuutin muutoksen suunta on -0.00 %.",
+    "Hintadatan ikä on 0.2 tuntia.",
+    "Ristiriita tarkoittaa kriteerien mukaan ei treidiä."
   ],
-  "rise_scenario": "Noususkenaario vahvistuu, jos US500-futuuri pysyy EMA20:n (7710.04) yläpuolella ja murtaa lasketun vastuksen 7743.50.",
-  "fall_scenario": "Laskuskenaario vahvistuu, jos hinta jää EMA20:n (7710.04) alle ja rikkoo lasketun tuen 7699.50.",
-  "invalidation": "Laskunäkemys mitätöityy, jos hinta nousee EMA20:n 7710.04 yläpuolelle ja pysyy siellä.",
-  "generated_at": "2026-08-19T08:47:55.771578+03:00",
+  "rise_scenario": "Noususkenaario vahvistuu, jos US500-futuuri pysyy EMA20:n (7737.49) yläpuolella ja murtaa lasketun vastuksen 7764.75.",
+  "fall_scenario": "Laskuskenaario vahvistuu, jos hinta jää EMA20:n (7737.49) alle ja rikkoo lasketun tuen 7698.25.",
+  "invalidation": "Odota tuoretta hintaa ja selkeää rakennetta.",
+  "generated_at": "2026-08-20T08:47:39.615974+03:00",
   "instrument": "ES=F (US500/S&P 500 E-mini -viitefutuuri; ei varmennettu IG-instrumentti)",
-  "price_time": "2026-08-19T05:37:53+00:00",
-  "support": 7699.5,
-  "resistance": 7743.5,
-  "ema20": 7710.04,
-  "ema50": 7724.56,
-  "rsi14": 34.7,
+  "price_time": "2026-08-20T05:37:30+00:00",
+  "support": 7698.25,
+  "resistance": 7764.75,
+  "ema20": 7737.49,
+  "ema50": 7734.04,
+  "rsi14": 36.0,
   "markets": [
     {
       "name": "US500-futuuri",
-      "price": 7700.0,
-      "change_pct": 0.0
+      "price": 7736.0,
+      "change_pct": -0.0
     },
     {
       "name": "S&P 500 käteinen",
-      "price": 7691.76,
-      "change_pct": -0.02
+      "price": 7707.98,
+      "change_pct": -0.0
     },
     {
       "name": "Nasdaq 100",
-      "price": 29490.96,
-      "change_pct": -0.02
+      "price": 29426.02,
+      "change_pct": 0.01
     },
     {
       "name": "Kulta",
-      "price": 4391.7,
-      "change_pct": -0.01
+      "price": 4536.7,
+      "change_pct": 0.0
     },
     {
       "name": "DAX",
-      "price": 26128.36,
-      "change_pct": -0.08
+      "price": 26091.33,
+      "change_pct": -0.14
     }
   ],
   "sources": [
     {
       "title": "Yahoo Finance – S&P 500 E-mini Futures (ES=F)",
       "url": "https://finance.yahoo.com/quote/ES=F/",
-      "published_at": "2026-08-19T05:37:53+00:00"
+      "published_at": "2026-08-20T05:37:30+00:00"
     },
     {
       "title": "TradingView – OANDA US500 graafi",
@@ -63,7 +64,7 @@
   "ig_note": "IG:n US500-instrumenttia ei ole varmennettu. Älä käytä viitetasoja sellaisenaan toimeksiantoon.",
   "errors": [
     "Uutiset: HTTP Error 429: Too Many Requests",
-    "Analyytikot: Expecting value: line 1 column 1 (char 0)"
+    "Analyytikot: HTTP Error 429: Too Many Requests"
   ],
   "disclaimer": "Ei sijoitusneuvontaa. Ei tuotto- tai riskittömyystakuuta. Kauppaa ei suoriteta käyttäjän puolesta."
 }
