@@ -63,6 +63,52 @@
       color: #444;
     }
 
+    .robot-launcher-panel {
+      margin: 32px 0;
+      padding: 24px;
+      color: white;
+      text-align: center;
+      background: linear-gradient(135deg, #102a43, #1f4f78);
+      border-radius: 16px;
+      box-shadow: 0 10px 26px rgba(16, 42, 67, 0.22);
+    }
+    .robot-launcher-panel h2 { margin: 0 0 8px; }
+    .robot-launcher-panel p { margin: 8px auto 18px; max-width: 620px; }
+    .robot-launcher-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
+    }
+    .robot-launcher-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 245px;
+      padding: 14px 20px;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      text-decoration: none;
+      border: 2px solid rgba(255, 255, 255, 0.45);
+      border-radius: 12px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+    .robot-launcher-button:hover,
+    .robot-launcher-button:focus-visible {
+      color: white;
+      filter: brightness(1.08);
+      transform: translateY(-2px);
+    }
+    .robot-launcher-button.natural-gas { background: #b45309; }
+    .robot-launcher-button.russell { background: #1d4ed8; }
+    .robot-launcher-note { font-size: 13px; opacity: 0.82; }
+    @media (max-width: 620px) {
+      .robot-launcher-actions { flex-direction: column; }
+      .robot-launcher-button { min-width: 0; }
+    }
+
     @keyframes scroll-left {
       0% {
         transform: translateX(100%);
@@ -267,6 +313,15 @@
     Open POP-MA Calculator
   </button>
 </a>
+      <div class="robot-launcher-panel" aria-labelledby="robot-launcher-title">
+        <h2 id="robot-launcher-title">Local analysis robots</h2>
+        <p>Open a fixed robot on this Windows computer. Your browser may ask for confirmation the first time.</p>
+        <div class="robot-launcher-actions">
+          <a class="robot-launcher-button natural-gas" href="aimtradingrobot://natural-gas" aria-label="Open the Natural Gas Barrier robot">🔥 Open Natural Gas Barrier</a>
+          <a class="robot-launcher-button russell" href="aimtradingrobot://russell" aria-label="Open the Russell 2000 Barrier robot">📈 Open Russell 2000 Barrier</a>
+        </div>
+        <p class="robot-launcher-note">The buttons work only on Markku's computer with AIM Trading Launcher installed.</p>
+      </div>
       <h2>Trading journal</h2>
       <p>📘 <a href="paivakirja.html">Open trading journal</a> – track daily options and insights!</p>
  </div>    
