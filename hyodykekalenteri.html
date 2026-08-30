@@ -124,6 +124,94 @@
       margin-bottom: 20px;
     }
 
+    .robot-card {
+      padding: 0;
+      overflow: hidden;
+      background: #061109;
+      border-color: rgba(157, 255, 70, 0.22);
+    }
+
+    .robot-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 24px;
+      border-bottom: 1px solid rgba(157, 255, 70, 0.14);
+    }
+
+    .robot-heading h2 {
+      color: #f5f7f5;
+      margin-bottom: 8px;
+    }
+
+    .robot-heading p {
+      color: #9fb6a5;
+      margin-bottom: 0;
+    }
+
+    .robot-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 0 0 auto;
+    }
+
+    .demo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 12px;
+      border: 1px solid rgba(255, 214, 64, 0.38);
+      border-radius: 999px;
+      color: #ffdb55;
+      background: rgba(255, 214, 64, 0.08);
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .robot-open {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: #071009;
+      background: #adff3f;
+      text-decoration: none;
+      font-weight: 800;
+      white-space: nowrap;
+      transition: transform 160ms ease, filter 160ms ease;
+    }
+
+    .robot-open:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.04);
+    }
+
+    .robot-frame-wrap {
+      background: #031006;
+    }
+
+    .robot-frame {
+      display: block;
+      width: 100%;
+      height: min(1120px, 88vh);
+      min-height: 760px;
+      border: 0;
+      background: #031006;
+    }
+
+    .robot-note {
+      margin: 0;
+      padding: 12px 24px 18px;
+      max-width: none;
+      color: #8fa598;
+      background: #031006;
+      font-size: 13px;
+    }
+
     .table-wrap {
       overflow-x: auto;
       border-radius: 18px;
@@ -243,6 +331,12 @@
     @media (max-width: 768px) {
       .container { padding: 16px; }
       .hero, .card { padding: 18px; border-radius: 18px; }
+      .robot-card { padding: 0; }
+      .robot-heading { align-items: flex-start; flex-direction: column; padding: 18px; }
+      .robot-actions { width: 100%; flex-wrap: wrap; }
+      .robot-open { flex: 1 1 180px; }
+      .robot-frame { height: 900px; min-height: 720px; }
+      .robot-note { padding: 12px 18px 18px; }
       h2 { font-size: 20px; }
       th, td { font-size: 13px; }
     }
@@ -262,7 +356,7 @@
         vaan antaa rauhallinen kartta: milloin seurata, milloin harkita ostoikkunaa ja milloin kannattaa pitää sormet
         poissa napilta kuin kahvikuppi näppäimistön vierestä maanantaiaamuna.
       </p>
-      <div class="status">🫡 Vedos valmiina sivulle upotettavaksi</div>
+      <div class="status">✅ Kalenteri ja hyödykerobotti samassa näkymässä</div>
     </section>
 
     <section class="card">
@@ -365,6 +459,35 @@
         <div class="legend-item"><span class="swatch risk"></span><span>⚠️ Kohonnut riski – varovaisuus</span></div>
         <div class="legend-item"><span class="swatch danger"></span><span>🚨 Poikkeuksellinen riski / myrskyaika</span></div>
       </div>
+    </section>
+
+    <section class="card robot-card" aria-labelledby="robot-title">
+      <div class="robot-heading">
+        <div>
+          <h2 id="robot-title">Hyödykerobotin tilannekuva</h2>
+          <p>Fundamentit näyttävät suunnan, 4H vahvistaa trendin ja M5 ajoittaa seurannan. Robotti ei avaa kauppoja.</p>
+        </div>
+        <div class="robot-actions">
+          <span class="demo-badge" title="Pisteet perustuvat tällä hetkellä testidataan">● DEMODATA</span>
+          <a
+            class="robot-open"
+            href="https://aim-commodity-calendar-robot.bnmolkj.chatgpt.site"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Avaa koko näytölle ↗</a>
+        </div>
+      </div>
+
+      <div class="robot-frame-wrap">
+        <iframe
+          class="robot-frame"
+          src="https://aim-commodity-calendar-robot.bnmolkj.chatgpt.site"
+          title="AIM Trading Commodity Calendar Robot"
+          loading="lazy"
+          allow="autoplay"
+        ></iframe>
+      </div>
+      <p class="robot-note">Pisteet ovat vielä testitietoja. Oikea IG-markkinadata kytketään myöhemmin MarketDataProviderin kautta.</p>
     </section>
 
     <section class="card">
