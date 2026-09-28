@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="fi">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>US500 · Markkinapäivän kronikka</title><link rel="stylesheet" href="./style.css"><script src="./web-state.js" defer></script><script src="./ui.js" defer></script></head>
+<body>
+<main class="cabinet"><p class="web-home"><a href="../index_fi.html">← AIM Tradingin etusivu</a></p>
+  <header class="masthead paper">
+    <div class="edition"><span>AIM TRADING · JULKINEN KATSAUS</span><span id="today">HELSINKI</span></div>
+    <div class="brand"><span class="flourish">❧</span><h1>US500</h1><span class="flourish mirror">❧</span></div>
+    <p class="subtitle">Markkinapäivän kronikka</p>
+    <p class="motto">Havainnot · Näkemykset · Harkinta</p>
+  </header>
+  <section class="ticker paper" aria-label="Markkinoiden hintanauha" id="ticker"><span>Haetaan markkinoiden viimeisimpiä tietoja…</span></section>
+  <div class="data-ribbon"><span id="dataNote">Julkiset lähteet · Hintadata voi olla viivästettyä</span><span id="updated">Päivitys käynnistyy…</span></div>
+  <section class="hero paper" aria-labelledby="outlookTitle">
+    <div class="eyebrow">TILANNE NYT <span class="tiny-rule"></span> S&amp;P 500 -FUTUURI</div>
+    <h2 id="outlookTitle">TIETOA ODOTETAAN</h2>
+    <div class="seal" id="confidence">Kootaan lähteitä</div>
+    <p class="hero-lead" id="mainReason">Avaamme päivän kronikan. Ensimmäinen päivitys voi kestää hetken.</p>
+    <p class="hero-secondary" id="extraReason"></p>
+    <div class="outlook-scale" aria-hidden="true"><span data-dir="down">Lasku</span><span data-dir="neutral">Epäselvä / sivuttain</span><span data-dir="up">Nousu</span></div>
+    <p class="fine" id="scope">Futuurien tekninen tilanne — ei koko päivän ennuste</p>
+  </section>
+  <section class="watch paper" aria-live="polite">
+    <div class="watch-heading"><span class="bell">♧</span><strong>Uutisvahti</strong><span id="watchText">Käsin päivitettävä katsaus</span></div>
+    <div class="watch-controls"><label><input type="checkbox" id="watchToggle"> Tarkista uudet katsaukset</label><label><input type="checkbox" id="soundToggle"> Ääni</label></div>
+    <div id="alerts" class="alerts"></div>
+  </section>
+  <div class="main-grid">
+    <section class="paper chart-panel">
+      <div class="section-top"><div><p class="eyebrow">FUTUURIEN SYKE</p><h3>Yön ja päivän liike</h3></div><span id="chartContract" class="small-tag">ES</span></div>
+      <div id="chartEmpty" class="empty">Hintahistoriaa odotetaan.</div>
+      <svg id="chart" viewBox="0 0 700 190" role="img" aria-label="S&P 500 -futuurin hintakehitys"></svg>
+      <div class="chart-labels"><span id="chartStart">—</span><span id="chartEnd">—</span></div>
+      <div class="metric-grid"><div><small>MARKKINAN VIRE</small><strong id="activity">—</strong></div><div><small>OSTO- / MYYNTIPAINE</small><strong id="pressure">—</strong></div></div>
+      <p class="fine">Paine arvioidaan nousevien ja laskevien 5 min kynttilöiden volyymista. Se ei ole ostajien ja myyjien kauppakohtainen mittaus.</p>
+    </section>
+    <section class="paper situation">
+      <p class="eyebrow">OMA PÄIVÄKATSAUKSESI</p><h3>Mikä muuttui?</h3>
+      <p id="changeText">Ensimmäistä tilannearviota odotetaan.</p>
+      <div class="condition"><small>MIKÄ MUUTTAISI NÄKYMÄN?</small><p id="condition">Tarvitsemme ensin riittävän tuoreen hintahistorian.</p></div>
+      <button class="primary" id="refresh">↻ &nbsp; Päivitä tilanne nyt</button>
+      <p id="refreshStatus" class="fine" role="status">Päivitystavoite 5–10 min · ajastus voi viivästyä.</p>
+      <p class="fine" id="nextOpen"></p>
+    </section>
+  </div>
+  <nav class="folio-nav" aria-label="Katsauksen osat">
+    <a href="#futures" class="paper"><span class="coin">↗</span><span>Futuurit ja myyntipaine<small>Tasot ja hintojen tausta &nbsp; ↓</small></span></a>
+    <a href="#analysts" class="paper"><span class="coin">❦</span><span>Analyytikoiden näkemykset<small>Nimet, lähteet ja ajankohdat &nbsp; ↓</small></span></a>
+    <a href="#news" class="paper"><span class="coin">☷</span><span>Uutiset ja tapahtumat<small>Päivän uutiskuva ja kalenteri &nbsp; ↓</small></span></a>
+  </nav>
+  <section class="paper section" id="futures"><div class="section-top"><h3>Futuurit ja myyntipaine</h3><span class="eyebrow">HINTA ENNEN MIELIPIDETTÄ</span></div>
+    <div class="levels" id="levels"></div><p class="fine">ES-futuurin hintatasot ovat eri tuotteen tasoja kuin IG US500:n. Niitä ei siirretä sellaisinaan IG-treidiin.</p>
+    <p id="igContext" class="source-note"></p>
+    <div class="reports"><div><h4>Aamun lähtötilanne</h4><p id="morningReport">Tallentuu päivän ensimmäisestä kelvollisesta arviosta klo 5–12 Suomen aikaa.</p></div><div><h4>Ennen USA:n avausta</h4><p id="premarketReport">Viimeisin kelvollinen ennen avausta tehty arvio säilyy tässä päivän vertailuna.</p></div></div>
+  </section>
+  <section class="paper section" id="analysts"><div class="section-top"><h3>Analyytikot &amp; treidaajan ääni</h3><span class="eyebrow">TAUSTAA, EI ÄÄNESTYSTULOS</span></div>
+    <p class="intro">Tuoreimmat saatavilla olevat julkiset maininnat. Otsikko ei yksin kerro puhujan koko näkemystä tai sen aikajännettä. Maksullisia raportteja ja videoita ei tulkita ilman sisältöä.</p><div id="analystCards" class="analyst-grid"></div>
+  </section>
+  <div class="news-grid">
+    <section class="paper section" id="news"><div class="section-top"><h3>Uutispöytä</h3><select id="newsFilter" aria-label="Rajaa uutislähde"><option value="">Kaikki lähteet</option><option value="Reuters">Reuters</option><option value="WSJ">WSJ</option><option value="CNBC">CNBC</option></select></div>
+      <p class="fine">Alkuperäiset otsikot lähteen kielellä. Suomenkielinen aihemerkintä; ei automaattista artikkelitiivistelmää.</p><div id="newsList"></div>
+    </section>
+    <section class="paper section" id="calendar"><div class="section-top"><h3>Tapahtumakalenteri</h3><span class="small-tag">SUOMEN AIKA</span></div><p class="fine">USA · kulunut 12 h ja seuraavat 8 päivää lähteen saatavuuden mukaan. Ajat voivat muuttua.</p><div id="eventsList"></div><a class="text-link" href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener noreferrer">Avaa lähteen koko kalenteri ↗</a></section>
+  </div>
+  <section class="paper section bottom-section"><details><summary>Lähteiden tila, arviointitapa ja muutoshistoria</summary><div id="sourceHealth" class="health-grid"></div>
+    <h4>Miten suunta syntyy?</h4><p class="fine">Sääntöpohjainen tekninen arvio, ei tekoälyn lukema uutisanalyysi: futuurijakson muutos yli ±0,10 %, 30 minuutin liike yli ±0,04 % ja poikkeama jakson volyymipainotetusta keskihinnasta yli ±0,03 %. Vähintään kaksi samansuuntaista merkkiä antaa alustavan suunnan. Vähintään 24 suljettua M5-kynttilää; Yli 15 minuuttia vanha verkkokatsaus tai yli 20 minuuttia vanha hintadata keskeyttää arvion. Raja-arvot ovat suunnitteluarvoja, eivät tuottotestattu strategia.</p>
+    <p class="fine">Uutisvahti tunnistaa otsikoiden avainsanoja, ei vahvista tapahtumaa tai sen vaikutusta. Uusi enintään 30 min vanha riskiotsikko, merkittävä talousjulkaisu (15 min ennen / 10 min jälkeen) tai yli 0,6 % liike 30 minuutissa keskeyttää suunnan. Julkiset lähteet voivat viivästyä tai puuttua; tämä ei ole sekuntitason uutispalvelu.</p>
+    <p class="fine">Vire vertaa viimeisen 30 minuutin kynttilöiden vaihteluväliä sitä edeltävään 90 minuuttiin. Talouskalenteri ei sisällä kaikkia puheita, uutisia tai pörssin poikkeussulkuja. Tavalliset USA:n osakepörssin pyhäpäivät huomioidaan avausajassa.</p>
+    <h4>Näkymän muutokset</h4><div id="history"></div></details></section>
+  <footer><span>❧ &nbsp; MARKKINAPÄIVÄN KRONIKKA</span><span>Julkinen verkkokatsaus · Ei toimeksiantoja · Vain julkiset lähteet</span></footer>
+</main>
+</body></html>

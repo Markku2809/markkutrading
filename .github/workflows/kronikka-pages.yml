@@ -1,0 +1,49 @@
+name: Julkaise sivusto ja US500 Kronikka
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '3,13,23,33,43,53 * * * *'
+permissions:
+  contents: read
+concurrency:
+  group: kronikka-pages
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Tarkista suunta-arvion ja vanhenemisen säännöt
+        run: |
+          python -m unittest discover -s _kronikka/tests
+          node --test _kronikka/tests/web-state.test.cjs
+      - name: Hae julkiset lähteet
+        run: python _kronikka/publish.py
+      - name: Kokoa koko sivusto
+        run: python _kronikka/stage.py
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Julkaise GitHub Pagesiin
+        id: deployment
+        uses: actions/deploy-pages@v4
