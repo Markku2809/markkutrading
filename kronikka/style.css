@@ -29,7 +29,8 @@ body{font-weight:600}
 .motto,.seal,.hero-secondary,.folio-nav small,.reports p{font-weight:700}
 
 .web-home{margin:0 0 10px;font:700 13px Segoe UI,sans-serif}.web-home a{color:#f5dfb8}
-.hero:before,.hero:after{content:'';width:80px;height:92px;top:72px;background:url('./assets/aim-vaakuna.png') center/contain no-repeat;filter:drop-shadow(0 2px 2px #57381835)}
+.hero:before,.hero:after{content:'';width:160px;height:184px;top:72px;background:url('./assets/aim-vaakuna.png') center/contain no-repeat;filter:drop-shadow(0 2px 2px #57381835)}
 .hero:before{left:18px}
 .hero:after{right:18px;transform:none}
+@media(min-width:1001px){.hero{padding-left:190px;padding-right:190px}.hero h2{overflow-wrap:anywhere}}
 @media(max-width:700px){.hero h2{overflow-wrap:anywhere}.news-item a,.analyst li a{overflow-wrap:anywhere}}
