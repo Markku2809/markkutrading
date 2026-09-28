@@ -29,6 +29,8 @@ body{font-weight:600}
 .motto,.seal,.hero-secondary,.folio-nav small,.reports p{font-weight:700}
 
 .web-home{margin:0 0 10px;font:700 13px Segoe UI,sans-serif}.web-home a{color:#f5dfb8}
+.tradingview-panel{margin-top:14px}.tv-chart-frame{height:560px;min-width:0;border:1px solid var(--line);background:#fff;border-radius:3px;overflow:hidden}.tradingview-widget-copyright{font:600 12px/28px 'Segoe UI',sans-serif;text-align:center;color:#555}.tradingview-widget-copyright a{color:#2962ff}
+@media(max-width:700px){.tv-chart-frame{height:470px}.tradingview-panel .section-top{flex-wrap:wrap}}
 .hero:before,.hero:after{content:'';width:160px;height:184px;top:72px;background:url('./assets/aim-vaakuna.png') center/contain no-repeat;filter:drop-shadow(0 2px 2px #57381835)}
 .hero:before{left:18px}
 .hero:after{right:18px;transform:none}
