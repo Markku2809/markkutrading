@@ -49,7 +49,7 @@ function render(s){
  const previous=s.history.find(h=>h.title!==a.title);
  $('changeText').textContent=previous?`Aiempi näkymä: ${previous.title.toLocaleLowerCase('fi-FI')} (${date(previous.at)}). Nyt: ${a.title.toLocaleLowerCase('fi-FI')}.`:'Nykyinen tilanne: '+a.title.toLocaleLowerCase('fi-FI')+'.';
  $('refresh').disabled=busy;$('refresh').textContent='↻  Tarkista uusin katsaus';
- $('refreshStatus').textContent='Päivitystavoite 5–10 min · ajastus voi viivästyä. Painike hakee viimeksi julkaistun katsauksen.';
+ $('refreshStatus').textContent='Uusin julkaistu katsaus tarkistetaan minuutin välein. Painike tarkistaa saman aineiston; uuden katsauksen julkaisu voi viivästyä.';
  $('nextOpen').textContent='Seuraava tavanomainen USA:n osakepörssin avaus '+date(s.next_open)+' Suomen aikaa. Futuurit käyvät kauppaa myös ennen avausta.';
  $('watchToggle').checked=s.watch;
  const failed=s.health.filter(h=>['news','calendar'].includes(h.group)&&!h.ok).length;
@@ -72,6 +72,9 @@ function showSnapshot(){
  const age=Math.max(0,Math.floor((Date.now()-Date.parse(s.collected_at))/60000));
  $('updated').textContent='Katsaus '+date(s.collected_at)+' · ikä '+age+' min';
  $('dataNote').textContent='Julkinen verkkokatsaus · hinnat voivat olla viivästettyjä';
+ if(s.analysis.direction==='stale'){
+  $('refreshStatus').textContent='Julkaisun tai hintalähteen päivitys on viivästynyt. Viimeisin katsaus: '+date(s.collected_at)+'. Uutta julkaisua tarkistetaan'+(webWatch?' automaattisesti minuutin välein.':' päivityspainikkeesta.');
+ }
  if(webError){
   $('refreshStatus').textContent='Uusinta katsausta ei voitu hakea. Näytetään aiempi aineisto aikaleimoineen.';
   document.querySelector('.hero').dataset.direction='stale';
@@ -84,7 +87,7 @@ function showSnapshot(){
 async function poll(){
  if(busy)return;busy=true;$('refresh').disabled=true;
  try{
-  const r=await fetch('./data/state.json?t='+Date.now(),{cache:'no-store'});
+  const r=await fetch('./data/state.json?t='+Date.now(),{cache:'no-store',signal:AbortSignal.timeout(15000)});
   if(!r.ok)throw Error();
   const candidate=await r.json();KronikkaWeb.prepare(candidate,Date.now());
   webSnapshot=candidate;webError=false;showSnapshot();

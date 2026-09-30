@@ -26,6 +26,7 @@ jobs:
         run: |
           python -m unittest discover -s _kronikka/tests
           node --test _kronikka/tests/web-state.test.cjs
+          node --test _kronikka/tests/poll.test.cjs
       - name: Hae julkiset lähteet
         run: python _kronikka/publish.py
       - name: Kokoa koko sivusto
